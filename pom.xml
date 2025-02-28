@@ -6,20 +6,19 @@
 
         <groupId>de.butzlabben</groupId>
         <artifactId>WorldSystem</artifactId>
-        <version>2.4.39</version>
+        <version>2.4.40</version>
 
         <properties>
             <!-- Dependencies -->
-            <SpigotAPI>1.21.3-R0.1-SNAPSHOT</SpigotAPI>
+            <SpigotAPI>1.21.4-R0.1-SNAPSHOT</SpigotAPI>
             <AuthLib>1.5.26</AuthLib>
             <WorldEdit>7.3.6-SNAPSHOT</WorldEdit>
-            <FAWE>2.12.0</FAWE>
+            <FAWE>2.13.0</FAWE>
             <VaultAPI>1.7.1</VaultAPI>
             <PlaceholderAPI>2.11.6</PlaceholderAPI>
             <Lombok>1.18.34</Lombok>
-            <CommonsIO>2.17.0</CommonsIO>
-            <Minimessage>4.17.0</Minimessage>
-            <SnakeYAML>2.3</SnakeYAML>
+            <CommonsIO>2.18.0</CommonsIO>
+            <Minimessage>4.19.0</Minimessage>
 
             <!-- Test dependencies -->
             <junitjupiter>5.11.3</junitjupiter>
@@ -69,12 +68,6 @@
         </dependencyManagement>
 
     <dependencies>
-    <!-- YAML Parser -->
-    <dependency>
-        <groupId>org.yaml</groupId>
-        <artifactId>snakeyaml</artifactId>
-        <version>${SnakeYAML}</version>
-    </dependency>
 
     <!-- Adventure API for text formatting -->
     <dependency>

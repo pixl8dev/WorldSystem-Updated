@@ -24,7 +24,7 @@ ext { // Dependency versions
     PlaceholderAPI = "2.11.6"
     Lombok = "1.18.34"
     CommonsIO = "2.18.0"
-    Minimessage = "4.18.0"
+    Minimessage = "4.19.0"
     SnakeYAML = "2.4"
     // Test dependencies
     Jupiter= "5.+"

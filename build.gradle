@@ -42,6 +42,8 @@ repositories {
 
 dependencies {
     
+    //implementation("com.google.code.gson:gson:2.8.0")
+    //implementation("com.google.guava:guava:21.0")
     // Adventure API for text formatting
     implementation("net.kyori:adventure-text-minimessage:${Minimessage}")
     
@@ -121,7 +123,7 @@ test {
     ignoreFailures = false
 }
 
-/*
+
 publishing {
     publications {
         customLibrary(MavenPublication) {
@@ -136,7 +138,7 @@ publishing {
         }
     }
 }
-*/
+
 tasks.build.dependsOn tasks.shadowJar
 
 defaultTasks 'build'

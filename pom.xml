@@ -50,7 +50,7 @@
                 <url>https://repo.extendedclip.com/releases/</url>
             </repository>
             <repository>
-                <id>worldedit/id>
+                <id>worldedit</id>
                 <url>https://maven.enginehub.org/repo/</url>
             </repository>
         </repositories>

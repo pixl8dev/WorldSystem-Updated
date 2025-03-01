@@ -20,12 +20,10 @@ import java.util.stream.Collectors;
 
 public class WorldEditListener implements Listener {
 
-    private final List<String> worldEditCommands = new ArrayList<>();
+    private final List<String> worldeditcmds = new ArrayList<>();
 
     public WorldEditListener() {
         try {
-            //String packageName = Bukkit.getServer().getClass().getPackage().getName();
-            //String version = packageName.substring(packageName.lastIndexOf(".") + 1);
             Class<?> serverClass = Class.forName("org.bukkit.craftbukkit.CraftServer");
 
             Field f1 = serverClass.getDeclaredField("commandMap");
@@ -34,37 +32,17 @@ public class WorldEditListener implements Listener {
 
             Field f2 = SimpleCommandMap.class.getDeclaredField("knownCommands");
             f2.setAccessible(true);
-            //@SuppressWarnings({"unchecked", "rawtypes"})
-            Map<String, Command> knownCommands = (Map) f2.get(commandMap);
-            worldEditCommands.addAll(knownCommands.entrySet().stream().filter(entry -> entry.getKey().contains("worldedit"))
-                    .map(entry -> entry.getValue().getName()).collect(Collectors.toList()));
+
+            @SuppressWarnings("unchecked")
+            Map<String, Command> knownCommands = (Map<String, Command>) f2.get(commandMap);
+            worldeditcmds.addAll(knownCommands.entrySet().stream()
+                    .filter(entry -> entry.getKey().contains("worldedit"))
+                    .map(entry -> entry.getValue().getName())
+                    .collect(Collectors.toList()));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    /*public WorldEditListener() {
-        try {
-            // Use reflection to access the CommandMap
-            Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            commandMapField.setAccessible(true);
-            CommandMap commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
-
-            // Retrieve all known commands
-            Field knownCommandsField = commandMap.getClass().getDeclaredField("knownCommands");
-            knownCommandsField.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
-
-            // Filter and collect WorldEdit commands
-            worldEditCommands.addAll(
-                knownCommands.keySet().stream()
-                    .filter(key -> key.toLowerCase().contains("worldedit"))
-                    .collect(Collectors.toList())
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
 
     @EventHandler
     public void playerCommandHandler(PlayerCommandPreprocessEvent event) {
@@ -86,8 +64,8 @@ public class WorldEditListener implements Listener {
     }
 
     private boolean isWorldEditCommand(String command) {
-        return worldEditCommands.contains(command)
-                || worldEditCommands.contains(command.replaceFirst("/", ""))
-                || worldEditCommands.contains(command.replaceFirst("/worldedit:", ""));
+        return worldeditcmds.contains(command)
+                || worldeditcmds.contains(command.replaceFirst("/", ""))
+                || worldeditcmds.contains(command.replaceFirst("/worldedit:", ""));
     }
 }

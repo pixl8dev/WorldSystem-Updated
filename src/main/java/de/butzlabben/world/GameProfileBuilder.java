@@ -5,15 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.util.UUIDTypeAdapter;
-// import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder; DEPRECATED
-
-/* DEPRECATED
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.HttpURLConnection; */
-//https://bitbucket.org/snakeyaml/snakeyaml/commits/ee85b4f37189c3be6ac3a772171bc92ed867c7bf
-import java.util.Base64; 
+// import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder; DEPRECATED use provided java.util.Base64
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -88,11 +80,13 @@ public class GameProfileBuilder {
         if (cape) {
             args.add(capeUrl);
         }
+
         profile.getProperties().put("textures",
-                new Property("textures", Base64.getEncoder().encodeToString(String.format(cape
-                        ? "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"},\"CAPE\":{\"url\":\"%s\"}}}"
-                        : "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"}}}",
-                        args.toArray(new Object[0])))));
+                new Property("textures", Base64.getEncoder().encodeToString(String.format(
+                        cape
+                                ? "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"},\"CAPE\":{\"url\":\"%s\"}}}"
+                                : "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"}}}",
+                        args.toArray(new Object[0])).getBytes())));
         return profile;
     }
 

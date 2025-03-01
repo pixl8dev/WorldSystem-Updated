@@ -25,10 +25,12 @@ ext { // Dependency versions
     Lombok = "1.18.34"
     CommonsIO = "2.18.0"
     Minimessage = "4.19.0"
+    gson = "2.12.1"
+    guava = "23.0"
     // Test dependencies
-    Jupiter= "5.+"
-    Mockito= "5.+"
-    Assertj= "3.+"
+    Jupiter = "5.+"
+    Mockito = "5.+"
+    Assertj = "3.+"
 
 }
 
@@ -41,8 +43,6 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.8.0")
-    implementation("com.google.guava:guava:21.0")
     // Adventure API for text formatting
     implementation("net.kyori:adventure-text-minimessage:${Minimessage}")
     
@@ -73,8 +73,8 @@ dependencies {
 
 configurations.all {
     resolutionStrategy {
-        force("com.google.code.gson:gson:2.8.0")
-        force("com.google.guava:guava:21.0")
+        force("com.google.code.gson:gson:${gson}")
+        force("com.google.guava:guava:${guava}")
     }
 }
 
@@ -116,8 +116,9 @@ javadoc {
 }
 
 tasks.withType(JavaCompile) {
+    options.deprecation = true
     options.encoding = 'UTF-8'
-    options.compilerArgs += ["-parameters"]
+    options.compilerArgs += ["-Xlint:unchecked"]
     options.fork = true
 }
 
@@ -128,23 +129,6 @@ test {
     }
     ignoreFailures = false
 }
-
-/*
-publishing {
-    publications {
-        customLibrary(MavenPublication) {
-            from components.java
-        }
-    }
-
-    repositories {
-        maven {
-            name = "${project.pluginname}"
-            url = layout.buildDirectory.dir("repo")
-        }
-    }
-}
-*/
 
 tasks.build.dependsOn tasks.shadowJar
 

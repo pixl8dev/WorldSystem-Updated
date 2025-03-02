@@ -1,5 +1,5 @@
 name: ${pluginname}
-main: ${group}.world.WorldSystem
+main: ${group}.worldsystem.WorldSystem
 version: ${version}
 authors: ${authors}
 description: ${description}

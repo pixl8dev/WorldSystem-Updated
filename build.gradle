@@ -4,7 +4,6 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'base'
-    id 'maven-publish'
 }
 
 java { 
@@ -102,6 +101,11 @@ shadowJar {
     minimize()
     archiveClassifier.set('')
     archiveFileName.set("${project.pluginname}-${project.version}.jar")
+    
+    dependencies {
+        exclude(dependency("commons-io:commons-io"))
+        exclude(dependency("net.kyori:adventure-text-minimessage"))
+    }
 }
 
 javadoc {
@@ -118,7 +122,7 @@ javadoc {
 tasks.withType(JavaCompile) {
     options.deprecation = false
     options.encoding = 'UTF-8'
-    //options.compilerArgs += ["-Xlint:unchecked"]
+    options.compilerArgs += ["-parameters"]
     options.fork = true
 }
 

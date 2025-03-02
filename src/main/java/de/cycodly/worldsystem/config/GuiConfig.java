@@ -19,7 +19,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.butzlabben.inventory.OrcItem;
+import de.cycodly.worldsystem.guicreate.OrcItem;
 import de.cycodly.worldsystem.WorldSystem;
 import de.cycodly.worldsystem.util.VersionUtil;
 

@@ -1,4 +1,4 @@
-package de.cycodly.worldsystem.gui.worldoption;
+package de.cycodly.worldsystem.gui;
 
 import de.cycodly.worldsystem.guicreate.DependListener;
 import de.cycodly.worldsystem.guicreate.OrcItem;

@@ -7,8 +7,6 @@ import de.cycodly.worldsystem.config.GuiConfig;
 import de.cycodly.worldsystem.gui.clicklistener.ComingSoonClickListener;
 import de.cycodly.worldsystem.gui.clicklistener.CommandExecutorClickListener;
 import de.cycodly.worldsystem.gui.WorldOptionStatus;
-import de.cycodly.worldsystem.gui.worldoption.FireStatus;
-import de.cycodly.worldsystem.gui.worldoption.TntStatus;
 import de.cycodly.worldsystem.wrapper.WorldPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;

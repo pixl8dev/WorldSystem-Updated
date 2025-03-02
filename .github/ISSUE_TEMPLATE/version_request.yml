@@ -10,6 +10,7 @@ body:
         Thanks to inform us about updates and dependencies.  
         _Sometimes Plugins, Softwares and Minecraft itself updates to a new version._  
         _Because that happens very often we can't keep track of everything._
+        ### THIS IS NOT FOR FEATURE REQUESTS! At the moment we don't add new features!
         
   - type: dropdown
     attributes:

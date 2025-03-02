@@ -9,6 +9,7 @@ body:
         ### Thank you for reporting a WorldSystem bug!  
         Fill out the following form to your best ability to help us fix the problem.  
         **Only use this if you're absolutely sure that you found a bug and can reproduce it.**
+        ### THIS IS NOT FOR FEATURE REQUESTS! At the moment we don't add new features!
 
   - type: dropdown
     attributes:
@@ -28,7 +29,8 @@ body:
       description: If not listed, it is not supported. Update to a supported version first.
       multiple: false
       options:
-        - 'above 1.21.3'
+        - 'above 1.21.4'
+        - '1.21.4'
         - '1.21.3'
         - '1.20.6'
         - '1.19.4'

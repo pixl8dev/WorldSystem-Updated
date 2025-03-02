@@ -3,7 +3,7 @@
 <img src="https://img.shields.io/github/downloads/Argantiu/WorldSystem-Updated/total?color=green&label=All%20Downloads&style=plastic" />
 <img src="https://img.shields.io/github/downloads/Argantiu/WorldSystem-Updated/v2.4.39/total?style=plastic&label=v2.4.39%20(latest)" /></br>
   <strong>A spigot plugin to give every user his own world</strong></br>
-  1.7 - 1.21.3 Support
+  1.7 - 1.21.4 Support
 
   ***
 </div>
@@ -27,4 +27,4 @@
   <li>Helping other users</li>
   <li>Leaving a good review</li>
 </ul>
-<a href="https://discord.gg/WYz7Qck">Discord Support</a>
+<a href="https://crazycloudcraft.de/dc">Discord Support</a>

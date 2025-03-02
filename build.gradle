@@ -116,9 +116,9 @@ javadoc {
 }
 
 tasks.withType(JavaCompile) {
-    options.deprecation = true
+    options.deprecation = false
     options.encoding = 'UTF-8'
-    options.compilerArgs += ["-Xlint:unchecked"]
+    //options.compilerArgs += ["-Xlint:unchecked"]
     options.fork = true
 }
 

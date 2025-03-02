@@ -1,4 +1,4 @@
-package de.cycodly.worldsystem.gui.playeroption;
+package de.cycodly.worldsystem.gui;
 
 import de.cycodly.worldsystem.guicreate.DependListener;
 import de.cycodly.worldsystem.guicreate.OrcItem;
@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 public class PlayerOptionStatus implements DependListener {
 
     private final WorldPlayer wp;
+    private final String statustype;
 
     public PlayerOptionStatus(WorldPlayer wp, String statustype) {
         this.wp = wp;
@@ -27,19 +28,14 @@ public class PlayerOptionStatus implements DependListener {
         switch (this.statustype) {
             case "build":
                 return wp.canBuild() ? OrcItem.enabled.getItemStack(p, wp) : OrcItem.disabled.getItemStack(p, wp);
-                break;
             case "gamemode":
                 return wp.canChangeGamemode() ? OrcItem.enabled.getItemStack(p, wp) : OrcItem.disabled.getItemStack(p, wp);
-                break;
             case "teleport":
                 return wp.canTeleport() ? OrcItem.enabled.getItemStack(p, wp) : OrcItem.disabled.getItemStack(p, wp);
-                break;
             case "worldedit":
                 return this.wp.canWorldedit() ? OrcItem.enabled.getItemStack(p, this.wp) : OrcItem.disabled.getItemStack(p, this.wp); // was without override before change
-                break;
-        
             default:
-                break;
+                return wp.canChangeGamemode() ? OrcItem.enabled.getItemStack(p, wp) : OrcItem.disabled.getItemStack(p, wp); //changes gamemode item if something is not working
         }
     }
 }

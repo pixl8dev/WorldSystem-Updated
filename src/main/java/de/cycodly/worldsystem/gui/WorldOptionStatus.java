@@ -13,6 +13,8 @@ import java.io.File;
 
 public class WorldOptionStatus implements DependListener {
 
+    private final String statustype;
+
     public WorldOptionStatus(String statustype) {
         this.statustype = statustype;
     }
@@ -26,11 +28,12 @@ public class WorldOptionStatus implements DependListener {
         if (!file.exists())
             return null;
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        boolean b = false;
         if (this.statustype == "tnt") {
-            boolean b = cfg.getBoolean("Settings.TNTDamage");
+            b = cfg.getBoolean("Settings.TNTDamage");
         } 
         if (this.statustype == "fire") {
-            boolean b = cfg.getBoolean("Settings.Fire");
+            b = cfg.getBoolean("Settings.Fire");
         }
         if (b)
             return OrcItem.enabled.getItemStack(p);

@@ -19,6 +19,7 @@ ext { // Dependency versions
     AuthLib = "1.5.26"
     WorldEdit = "7.3.6-SNAPSHOT"
     FAWE = "2.13.0"
+    Chunky = "1.3.38"
     VaultAPI = "1.7.1"
     PlaceholderAPI = "2.11.6"
     Lombok = "1.18.34"
@@ -39,6 +40,7 @@ repositories {
     // Plugin repositories
     maven { url "https://repo.extendedclip.com/releases/" }
     maven { url "https://maven.enginehub.org/repo/" }
+    maven { url "https://repo.codemc.io/repository/maven-public/" }
 }
 
 dependencies {
@@ -61,6 +63,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-core:${WorldEdit}")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:${FAWE}")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core:${FAWE}")
+    compileOnly("org.popcraft:chunky-common:${Chunky}")
 
     // Test dependencies
     testImplementation "org.junit.jupiter:junit-jupiter:${Jupiter}"

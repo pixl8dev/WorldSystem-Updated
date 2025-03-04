@@ -90,6 +90,7 @@ public class WorldConfig {
     public static void create(UUID uuid, WorldTemplate template) {
         DependenceConfig dc = new DependenceConfig(uuid);
         String worldname = dc.getWorldname();
+        WorldSystem.logger().log(Level.INFO, PluginConfig.getWorlddir() + worldname);
         File file = new File(PluginConfig.getWorlddir() + worldname + "/worldconfig.yml");
         try {
             file.createNewFile();
@@ -108,8 +109,9 @@ public class WorldConfig {
         try {
             cfg.save(file);
         } catch (IOException e) {
-            e.printStackTrace();
             WorldSystem.logger().log(Level.SEVERE,"Error while saving worldconfig for " + uuid.toString());
+            WorldSystem.logger().log(Level.SEVERE,e.getMessage());
+            e.printStackTrace();
         }
     }
 

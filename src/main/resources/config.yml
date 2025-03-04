@@ -41,7 +41,7 @@ request_expires: 20
 # Optimisation #
 ################
 
-# If WorldSystem should load the worlds async if possible (FAWE installed)
+# If WorldSystem should load the worlds async if possible (needs Chunky to be installed!)
 load_worlds_async: true
 
 # When nobody is on a world time until it get unloaded

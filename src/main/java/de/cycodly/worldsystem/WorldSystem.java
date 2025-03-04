@@ -29,6 +29,7 @@ import de.cycodly.worldsystem.util.VersionUtil;
 import de.cycodly.worldsystem.database.DatabaseProvider;
 import de.cycodly.worldsystem.wrapper.CreatorAdapter;
 import de.cycodly.worldsystem.wrapper.SystemWorld;
+import de.cycodly.worldsystem.wrapper.AsyncCreatorAdapter;
 
 /**
  * @author Butzlabben
@@ -41,6 +42,7 @@ public class WorldSystem extends JavaPlugin {
     private static boolean is1_13Plus = false;
     final private String version = this.getDescription().getVersion();
     private CreatorAdapter creator;
+    
 
     public static void createConfigs() {
         File folder = getInstance().getDataFolder();
@@ -49,17 +51,22 @@ public class WorldSystem extends JavaPlugin {
         File dconfig = new File(folder, "dependence.yml");
         File languages = new File(folder + "/languages");
         File gui = new File(folder, "gui.yml");
+        String[] langfile = {"en","de","hu","nl","pl","es","ru","fi","ja","zh","fr"};
 
         if (!dir.exists()) {
             dir.mkdirs();
         }
 
-        if (!languages.exists())
+        if (!languages.exists()) {
             languages.mkdirs();
+        }
 
         PluginConfig.checkConfig(config);
 
-        MessageConfig.checkConfig(new File(languages, "en.yml"));
+        for (String lang : langfile) {
+            MessageConfig.checkConfig(new File(languages, lang+".yml"));
+        }
+        /*MessageConfig.checkConfig(new File(languages, "en.yml"));
         MessageConfig.checkConfig(new File(languages, "de.yml"));
         MessageConfig.checkConfig(new File(languages, "hu.yml"));
         MessageConfig.checkConfig(new File(languages, "nl.yml"));
@@ -69,7 +76,7 @@ public class WorldSystem extends JavaPlugin {
         MessageConfig.checkConfig(new File(languages, "fi.yml"));
         MessageConfig.checkConfig(new File(languages, "ja.yml"));
         MessageConfig.checkConfig(new File(languages, "zh.yml"));
-        MessageConfig.checkConfig(new File(languages, "fr.yml"));
+        MessageConfig.checkConfig(new File(languages, "fr.yml"));*/
 
         MessageConfig.checkConfig(new File(languages, PluginConfig.getLanguage() + ".yml"));
 
@@ -142,13 +149,12 @@ public class WorldSystem extends JavaPlugin {
             }
         }, 20 * 60 * 2, 20 * 60 * 2);
 
-        if (Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null
-                && Bukkit.getPluginManager().getPlugin("WorldEdit") != null
+        if (Bukkit.getPluginManager().getPlugin("Chunky") != null
                 && PluginConfig.loadWorldsASync()
                 && !is1_13Plus) {
 
-            Bukkit.getConsoleSender()
-                    .sendMessage(PluginConfig.getPrefix() + "Found FAWE! Worlds now will be created asynchronously");
+            creator = new AsyncCreatorAdapter();
+            Bukkit.getConsoleSender().sendMessage(PluginConfig.getPrefix() + "Found Chunky! Worlds now will be created asynchronously");
         } else {
             creator = (c, sw, r) -> {
                 Bukkit.getWorlds().add(c.createWorld());

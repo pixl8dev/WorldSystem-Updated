@@ -84,7 +84,7 @@ processResources {
     expand project.properties  // Replace placeholders in resources
     from(sourceSets.main.resources.srcDirs) {
         include 'plugin.yml'  // Ensure plugin.yml is included
-        duplicatesStrategy.INCLUDE  // Handle duplicates
+        duplicatesStrategy = duplicatesStrategy.INCLUDE  // Handle duplicates
     }
     filesMatching('plugin.yml') {
         expand (

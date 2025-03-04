@@ -87,16 +87,26 @@ processResources {
         duplicatesStrategy = duplicatesStrategy.INCLUDE  // Handle duplicates
     }
     filesMatching('plugin.yml') {
-        expand (
-            pluginname: project.pluginname,
-            group: project.group,
-            version: project.version,
-            authors: project.authors,
-            description: project.description,
-            apiversion: project.apiversion,
-            depend: project.depend,
-            softdepend: project.softdepend,
-        )
+        // Using `project.hasProperty()` ensures compatibility with the configuration phase
+        if (project.hasProperty('pluginname') && project.hasProperty('group') &&
+            project.hasProperty('version') && project.hasProperty('authors') &&
+            project.hasProperty('description') && project.hasProperty('apiversion') &&
+            project.hasProperty('depend') && project.hasProperty('softdepend')) {
+            
+            expand(
+                pluginname: project.pluginname,
+                group: project.group,
+                version: project.version,
+                authors: project.authors,
+                description: project.description,
+                apiversion: project.apiversion,
+                depend: project.depend,
+                softdepend: project.softdepend
+            )
+        } else {
+            // Handle missing properties (optional, depending on your use case)
+            logger.warn("Some project properties are missing.")
+        }
     }
 }
 

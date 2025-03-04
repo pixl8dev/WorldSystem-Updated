@@ -36,11 +36,11 @@ ext { // Dependency versions
 
 repositories {
     mavenCentral()
-    maven { url "https://jitpack.io" }
+    maven({ url = "https://jitpack.io" })
     // Plugin repositories
-    maven { url "https://repo.extendedclip.com/releases/" }
-    maven { url "https://maven.enginehub.org/repo/" }
-    maven { url "https://repo.codemc.io/repository/maven-public/" }
+    maven({ url = "https://repo.extendedclip.com/releases/" })
+    maven({ url = "https://maven.enginehub.org/repo/" })
+    maven({ url = "https://repo.codemc.io/repository/maven-public/" })
 }
 
 dependencies {
@@ -84,7 +84,7 @@ processResources {
     expand project.properties  // Replace placeholders in resources
     from(sourceSets.main.resources.srcDirs) {
         include 'plugin.yml'  // Ensure plugin.yml is included
-        duplicatesStrategy DuplicatesStrategy.INCLUDE  // Handle duplicates
+        duplicatesStrategy.INCLUDE  // Handle duplicates
     }
     filesMatching('plugin.yml') {
         expand (

@@ -12,6 +12,7 @@ softdepend: ${softdepend}
 commands:
   ws:
     description: WorldSystem command
+    permission: ws.use
     #usage: /ws <subcommand>
 
 permissions:

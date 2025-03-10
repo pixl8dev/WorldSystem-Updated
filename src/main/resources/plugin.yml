@@ -13,7 +13,7 @@ commands:
   ws:
     description: WorldSystem command
     permission: ws.use
-    #usage: /ws <subcommand>
+    # usage: /ws <subcommand>
 
 permissions:
   ws.*:

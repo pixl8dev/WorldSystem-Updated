@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import de.cycodly.worldsystem.WorldSystem;
 import lombok.Getter;
 
-public abstract class DatabaseConnection implements DatabaseUtil {
+public abstract class DataConnector implements IDataUtil {
 
     final Object lock = new Object();
     @Getter

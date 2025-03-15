@@ -8,7 +8,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
-public class SqliteConnection extends DatabaseConnection {
+public class SQliteConnector extends DataConnector {
 
     private void connect(String file) {
         if (VersionUtil.getVersion() <= 8) {

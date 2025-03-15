@@ -7,7 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
-public class MysqlConnection extends DatabaseConnection {
+public class MySQLConnector extends DataConnector {
 
     private void connect(String host, String database, String port, String user, String password) {
         synchronized (lock) {

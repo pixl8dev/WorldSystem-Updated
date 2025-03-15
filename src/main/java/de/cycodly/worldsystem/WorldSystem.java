@@ -26,8 +26,8 @@ import de.cycodly.worldsystem.listener.WorldInitSkipSpawn;
 import de.cycodly.worldsystem.util.PapiExtension;
 import de.cycodly.worldsystem.util.PlayerPositions;
 import de.cycodly.worldsystem.util.VersionUtil;
-import de.cycodly.worldsystem.database.DatabaseProvider;
-import de.cycodly.worldsystem.wrapper.CreatorAdapter;
+import de.cycodly.worldsystem.database.DataProvider;
+import de.cycodly.worldsystem.wrapper.ICreatorAdapter;
 import de.cycodly.worldsystem.wrapper.SystemWorld;
 import de.cycodly.worldsystem.wrapper.AsyncCreatorAdapter;
 
@@ -41,7 +41,7 @@ import de.cycodly.worldsystem.wrapper.AsyncCreatorAdapter;
 public class WorldSystem extends JavaPlugin {
     private static boolean is1_13Plus = false;
     final private String version = this.getDescription().getVersion();
-    private CreatorAdapter creator;
+    private ICreatorAdapter creator;
     
 
     public static void createConfigs() {
@@ -122,7 +122,7 @@ public class WorldSystem extends JavaPlugin {
         createConfigs();
 
         // Establish database connection
-        DatabaseProvider.instance.util.connect();
+        DataProvider.instance.util.connect();
 
         // Check if tables exist and create them if necessary.
         PlayerPositions.instance.checkTables();
@@ -199,13 +199,13 @@ public class WorldSystem extends JavaPlugin {
         }
 
         // Close database connection
-        DatabaseProvider.instance.util.close();
+        DataProvider.instance.util.close();
 
         Bukkit.getConsoleSender()
                 .sendMessage(PluginConfig.getPrefix() + "Successfully disabled WorldSystem v" + version);
     }
 
-    public CreatorAdapter getAdapter() {
+    public ICreatorAdapter getAdapter() {
         return creator;
     }
 }

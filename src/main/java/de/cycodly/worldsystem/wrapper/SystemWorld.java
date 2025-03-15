@@ -23,7 +23,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 /**
- * This class represents a systemworld, loaded or not
+ * This class represents if a systemworld is loaded or not
  *
  * @author Butzlabben
  * @since 14.02.2018

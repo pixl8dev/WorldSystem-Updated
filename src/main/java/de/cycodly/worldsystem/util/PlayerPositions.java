@@ -3,8 +3,8 @@ package de.cycodly.worldsystem.util;
 import com.google.common.base.Preconditions;
 import de.cycodly.worldsystem.config.PluginConfig;
 import de.cycodly.worldsystem.config.WorldConfig;
-import de.cycodly.worldsystem.database.DatabaseProvider;
-import de.cycodly.worldsystem.database.DatabaseUtil;
+import de.cycodly.worldsystem.database.DataProvider;
+import de.cycodly.worldsystem.database.IDataUtil;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ public class PlayerPositions {
     @Getter
     public static PlayerPositions instance = new PlayerPositions();
 
-    private final DatabaseUtil util = DatabaseProvider.instance.util;
+    private final IDataUtil util = DataProvider.instance.util;
 
     private PlayerPositions() {
         checkTables();

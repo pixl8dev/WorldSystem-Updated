@@ -35,24 +35,19 @@ public class OrcItem {
     }
 
     public OrcItem(Material mat, String display, List<String> lore) {
-        setItemStack(mat, (byte) 0, display, lore);
+        setItemStack(mat, display, lore);
     }
 
     public OrcItem(Material mat) {
         this(new ItemStack(mat));
     }
 
-    public OrcItem(Material material, byte data, String display, ArrayList<String> lore) {
-        setItemStack(material, data, display, lore);
-    }
-
     public void setCallback(Runnable r) {
         callback = r;
     }
 
-    //@SuppressWarnings("deprecation")
-    public OrcItem setItemStack(Material mat, byte data, String display, List<String> lore) {
-        is = new ItemStack(mat, 1, data);
+    public OrcItem setItemStack(Material mat, String display, List<String> lore) {
+        is = new ItemStack(mat, 1);
         ItemMeta meta = is.getItemMeta();
         meta.setDisplayName(display);
         meta.setLore(lore);
@@ -128,7 +123,7 @@ public class OrcItem {
     }
 
     public OrcItem setItemStack(Material mat, String display, String... lore) {
-        return setItemStack(mat, (byte) 0, display, Arrays.asList(lore));
+        return setItemStack(mat, display, Arrays.asList(lore));
     }
 
     public OrcItem setDepend(DependListener listener) {

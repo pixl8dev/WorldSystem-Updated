@@ -34,15 +34,7 @@ public class GuiConfig {
         file = f;
         if (!file.exists()) {
             try {
-                String guiFileResource;
-                if (VersionUtil.getVersion() >= 13) {
-                    guiFileResource = "gui.yml";
-                /* } else if (VersionUtil.getVersion() == 13) {
-                    guiFileResource = "1_13_gui.yml";*/
-                } else {
-                    guiFileResource = "legacy_gui.yml";
-                }
-                InputStream in = JavaPlugin.getPlugin(WorldSystem.class).getResource(guiFileResource);
+                InputStream in = JavaPlugin.getPlugin(WorldSystem.class).getResource("gui.yml");
                 Files.copy(in, file.toPath());
             } catch (IOException e) {
                 WorldSystem.logger().log(Level.SEVERE,"Wasn't able to create Config");
@@ -67,13 +59,13 @@ public class GuiConfig {
     }
 
     public static int getSlot(String path) {
-        YamlConfiguration cfg = getConfig();
-        return (cfg.getInt(path + ".slot.row") - 1) * 9 + cfg.getInt(path + ".slot.col") - 1;
+        YamlConfiguration getConf = getConfig();
+        return (getConf.getInt(path + ".slot.row") - 1) * 9 + getConf.getInt(path + ".slot.col") - 1;
     }
 
     public static int getState(String path) {
-        YamlConfiguration cfg = getConfig();
-        return (cfg.getInt(path + ".state.row") - 1) * 9 + cfg.getInt(path + ".state.col") - 1;
+        YamlConfiguration getConf = getConfig();
+        return (getConf.getInt(path + ".state.row") - 1) * 9 + getConf.getInt(path + ".state.col") - 1;
     }
 
     public static boolean isEnabled(String path) {
@@ -84,12 +76,12 @@ public class GuiConfig {
         return getConfig().getInt(path + ".rows", 1);
     }
 
-    public static String getDisplay(FileConfiguration cfg, String path) {
-        return ChatColor.translateAlternateColorCodes('&', cfg.getString(path + ".display"));
+    public static String getDisplay(FileConfiguration getConf, String path) {
+        return ChatColor.translateAlternateColorCodes('&', getConf.getString(path + ".display"));
     }
 
-    public static ArrayList<String> getLore(FileConfiguration cfg, String path) {
-        List<String> list = cfg.getStringList(path + ".lore");
+    public static ArrayList<String> getLore(FileConfiguration getConf, String path) {
+        List<String> list = getConf.getStringList(path + ".lore");
         ArrayList<String> colored = new ArrayList<>(list.size());
         for (String s : list) {
             colored.add(ChatColor.translateAlternateColorCodes('&', s));
@@ -97,17 +89,13 @@ public class GuiConfig {
         return colored;
     }
 
-    public static byte getData(FileConfiguration cfg, String path) {
-        return (byte) cfg.getInt(path + ".data", 0);
+    public static String getTitle(FileConfiguration getConf, String path) {
+        return getConf.getString(path + ".title");
     }
 
-    public static String getTitle(FileConfiguration cfg, String path) {
-        return cfg.getString(path + ".title");
-    }
-
-    public static Material getMaterial(FileConfiguration cfg, String path) {
+    public static Material getMaterial(FileConfiguration getConf, String path) {
         try {
-            return Material.valueOf(cfg.getString(path + ".material").toUpperCase());
+            return Material.valueOf(getConf.getString(path + ".material").toUpperCase());
         } catch (IllegalArgumentException ex) {
             Bukkit.getConsoleSender().sendMessage(PluginConfig.getPrefix() + "§cUnknown material: " + path);
             return null;
@@ -115,13 +103,9 @@ public class GuiConfig {
     }
 
     public static OrcItem getItem(String path) {
-        YamlConfiguration cfg = getConfig();
+        YamlConfiguration getConf = getConfig();
         try {
-            return new OrcItem(getMaterial(cfg, path), getData(cfg, path), getDisplay(cfg, path), getLore(cfg, path));
-        } catch (Exception ignored) {
-        }
-        try {
-            return new OrcItem(getMaterial(cfg, path), getDisplay(cfg, path), getLore(cfg, path));
+            return new OrcItem(getMaterial(getConf, path), getDisplay(getConf, path), getLore(getConf, path));
         } catch (Exception ignored) {
         }
         return OrcItem.error.clone().setDisplay("§c" + path);

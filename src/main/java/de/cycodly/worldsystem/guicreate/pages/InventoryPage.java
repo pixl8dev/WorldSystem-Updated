@@ -21,11 +21,10 @@ public class InventoryPage extends OrcInventory {
     public InventoryPage(String title, int page, int pages) {
         super(title, 6);
 
-        YamlConfiguration cfg = GuiConfig.getConfig();
+        YamlConfiguration getConf = GuiConfig.getConfig();
         String path = "options.players.currentpage";
 
-        OrcItem oi = new OrcItem(GuiConfig.getMaterial(cfg, path), GuiConfig.getData(cfg, path),
-                GuiConfig.getDisplay(cfg, path).replaceAll("%page", "" + page), GuiConfig.getLore(cfg, path));
+        OrcItem oi = new OrcItem(GuiConfig.getMaterial(getConf, path), GuiConfig.getDisplay(getConf, path).replaceAll("%page", "" + page), GuiConfig.getLore(getConf, path));
         addItem(GuiConfig.getSlot(path), oi);
 
         path = "options.players.pagebefore";

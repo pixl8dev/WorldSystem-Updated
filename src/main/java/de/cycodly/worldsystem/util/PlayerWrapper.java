@@ -2,8 +2,8 @@ package de.cycodly.worldsystem.util;
 
 import com.google.common.base.Preconditions;
 import de.cycodly.worldsystem.config.PluginConfig;
-import de.cycodly.worldsystem.database.DatabaseProvider;
-import de.cycodly.worldsystem.database.DatabaseUtil;
+import de.cycodly.worldsystem.database.DataProvider;
+import de.cycodly.worldsystem.database.IDataUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class PlayerWrapper {
 
-    private static final DatabaseUtil util = DatabaseProvider.instance.util;
+    private static final IDataUtil util = DataProvider.instance.util;
 
     static {
         checkTables();

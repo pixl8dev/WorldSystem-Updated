@@ -12,7 +12,7 @@ import java.util.logging.Level;
 
 import java.util.Objects;
 
-public class AsyncCreatorAdapter implements CreatorAdapter {
+public class AsyncCreatorAdapter implements ICreatorAdapter {
 
     private final WorldSystem worldSystem = WorldSystem.getInstance();
     private boolean generationComplete = false;
@@ -20,15 +20,15 @@ public class AsyncCreatorAdapter implements CreatorAdapter {
     // Create worlds async
     @Override
     public void create(WorldCreator creator, SystemWorld sw, Runnable r) {
-        // Load the ChunkyAPI service once
+        // Load ChunkyAPI service
         ChunkyAPI chunky = Bukkit.getServer().getServicesManager().load(ChunkyAPI.class);
         String worldName = creator.name();
 
         if (Bukkit.getWorld(worldName) == null) {
-            // Start the Chunky world generation task asynchronously
+            // Start Chunky world generation task asynchronously
             chunky.startTask(worldName, "square", 0, 0, 500, 500, "concentric");
 
-            // Set up the callback for when the generation is complete
+            // Set up callback for when the generation is complete
             chunky.onGenerationComplete(this::onWSGenComplete);
 
             new Thread(() -> {
@@ -41,13 +41,13 @@ public class AsyncCreatorAdapter implements CreatorAdapter {
                 }
                 // Once generation is complete, perform the next actions (on the main thread)
                 Bukkit.getScheduler().runTask(worldSystem, () -> {
-                    // Perform block operations or additional logic after generation is complete
+                    // Perform block operation after generation is complete
                     Block block = Bukkit.getWorld(worldName).getBlockAt(0, -64, 0);
-                    block.setType(Material.BEDROCK);  // Example operation
+                    block.setType(Material.BEDROCK);
                     if (sw != null) {
                         sw.setCreating(false);  // Mark world creation as complete
                     }
-                    r.run();  // Run the callback after the task completes
+                    r.run();
                 });
             }).start();
         } else {
@@ -57,7 +57,6 @@ public class AsyncCreatorAdapter implements CreatorAdapter {
     }
     // This method will be triggered when generation is complete
     private void onWSGenComplete(GenerationCompleteEvent event) {
-        // Set the variable to true when generation is complete
         generationComplete = true;
         Bukkit.getLogger().info("World generation completed for " + event.world());
     }

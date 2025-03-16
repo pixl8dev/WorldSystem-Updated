@@ -1,3 +1,13 @@
+val plugingroup = "de.cycodly"
+val pluginname = "WorldSystem"
+val pluginauthors = "[Butzlabben, Trainerlord, Cycodly]"
+val pluginversion = "2.4.40-dev"
+val plugindescription = "WorldSystem plugin to create per player worlds"
+val pluginapiversion = "1.16"
+val pluginminecraft = "1.21.4"
+val plugindepend = "[WorldEdit]"
+val pluginsoftdepend = "[PlaceholderAPI, Vault, Chunky]"
+
 plugins {
     id("com.gradleup.shadow") version "8.3.6"
     id("io.freefair.lombok") version "8.13"
@@ -6,8 +16,8 @@ plugins {
     id("base")
 }
 
-base { 
-    archivesName = pluginname 
+base {
+    archivesName = pluginname
 }
 
 java {
@@ -16,24 +26,12 @@ java {
     }
 }
 
-val pluginname = "WorldSystem"
-val authors = "[Butzlabben, Trainerlord, Cycodly]"
-val version = "2.4.40-dev"
-val description = "WorldSystem plugin to create per player worlds"
-val apiversion = "1.16"
-val minecraft = "1.21.4"
-val depend = "[WorldEdit]"
-val softdepend = "[PlaceholderAPI, Vault, Chunky]"
-/*java { sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}*/
-
 repositories {
-        mavenCentral()
-        maven("https://jitpack.io")
-        maven("https://repo.extendedclip.com/releases/")
-        maven("https://maven.enginehub.org/repo/")
-        maven("https://repo.codemc.io/repository/maven-public/")
+    mavenCentral()
+    maven("https://jitpack.io")
+    maven("https://repo.extendedclip.com/releases/")
+    maven("https://maven.enginehub.org/repo/")
+    maven("https://repo.codemc.io/repository/maven-public/")
 }
 
 dependencies {
@@ -62,67 +60,71 @@ configurations.all {
     }
 }
 
-task processResources {
-    expand(project.properties)
-    from(sourceSets["main"].resources.srcDirs) {
+tasks.processResources {
+    filesMatching("plugin.yml") {
+        expand(
+            "pluginname" to pluginname,
+            "group" to plugingroup,
+            "version" to pluginversion,
+            "authors" to pluginauthors,
+            "description" to plugindescription,
+            "apiversion" to pluginapiversion,
+            "depend" to plugindepend,
+            "softdepend" to pluginsoftdepend
+        )
+    }
+    from(sourceSets.main.get().resources.srcDirs) {
         include("plugin.yml")
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
-    filesMatching("plugin.yml") {
-            expand(
-                "pluginname" to pluginname,
-                "group" to group,
-                "version" to version,
-                "authors" to authors,
-                "description" to description,
-                "apiversion" to apiversion,
-                "depend" to depend,
-                "softdepend" to softdepend
+}
+
+tasks.shadowJar {
+    minimize()
+    archiveClassifier.set("")
+    archiveFileName.set("$pluginname-$pluginversion.jar")
+    dependencies {
+        exclude(dependency("commons-io:commons-io"))
+        exclude(dependency("net.kyori:adventure-text-minimessage"))
+    }
+}
+
+tasks.withType<Javadoc> {
+    source = sourceSets.main.get().allJava
+    destinationDir = file("build/javadocs")
+    include("**/api/*")
+    options {
+        (this as? StandardJavadocDocletOptions)?.apply {
+            links(
+                "https://javadoc.io/static/org.jetbrains/annotations/20.1.0/",
+                "https://docs.oracle.com/javase/21/docs/api/",
+                "https://papermc.io/javadocs/paper/$pluginminecraft/"
             )
         }
     }
 }
 
-tasks {
-               
-    shadowJar {
-        minimize()
-        archiveClassifier.set("")
-        archiveFileName.set("${pluginname}-${version}.jar")
-        // dependencies {
-        //     exclude(dependency("commons-io:commons-io"))
-        //     exclude(dependency("net.kyori:adventure-text-minimessage"))
-        // }
-    }
-    javadoc {
-        options {
-            links("https://javadoc.io/static/org.jetbrains/annotations/20.1.0/")
-            links("https://docs.oracle.com/javase/21/docs/api/")
-            links("https://papermc.io/javadocs/paper/$minecraft/")
-        }
-        source = sourceSets["main"].allJava
-        include("**/api/*")
-        destinationDir = file("build/javadocs")
-    }
-    withType<JavaCompile> {
-        options.isDeprecation = false
-        options.encoding = "UTF-8"
-        //options.compilerArgs += "-parameters"
-        options.isFork = true
-    }
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-        ignoreFailures = false
-    }
-    
-
+tasks.withType<JavaCompile> {
+    options.isDeprecation = false
+    options.encoding = "UTF-8"
+    options.compilerArgs.add("-parameters")
+    options.isFork = true
 }
 
-build {
-        dependsOn(task.shadowJar)
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
     }
+    ignoreFailures = false
+}
 
-defaultTasks("build")
+tasks.jar {
+    archiveFileName.set("$pluginname-$pluginversion.jar")
+}
+
+tasks.build {
+    //dependsOn(tasks.shadowJar)
+}
+
+project.defaultTasks("build")

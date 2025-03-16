@@ -150,8 +150,7 @@ public class WorldSystem extends JavaPlugin {
         }, 20 * 60 * 2, 20 * 60 * 2);
 
         if (Bukkit.getPluginManager().getPlugin("Chunky") != null
-                && PluginConfig.loadWorldsASync()
-                && !is1_13Plus) {
+                && PluginConfig.loadWorldsASync()) {
 
             creator = new AsyncCreatorAdapter();
             Bukkit.getConsoleSender().sendMessage(PluginConfig.getPrefix() + "Found Chunky! Worlds now will be created asynchronously");

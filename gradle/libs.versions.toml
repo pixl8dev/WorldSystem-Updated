@@ -14,7 +14,6 @@ guava = "31.1-jre"
 jupiter = "5.12.1"
 mockito = "5.16.0"
 assertj = "3.27.3"
-group = { group = "de.cycodly" }
 
 [libraries]
 spigotapi = { module = "org.spigotmc:spigot-api", version.ref = "spigotapi" }

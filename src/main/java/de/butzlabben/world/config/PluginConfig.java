@@ -83,11 +83,67 @@ public class PluginConfig {
             }
         } else {
             try {
+                // Create parent directories if they don't exist
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                
+                // Try to get the config from resources
                 InputStream in = JavaPlugin.getPlugin(WorldSystem.class).getResource("config.yml");
-                Files.copy(in, file.toPath());
+                if (in != null) {
+                    // Copy from resources
+                    Files.copy(in, file.toPath());
+                    in.close();
+                } else {
+                    // Create a new config with default values if resource not found
+                    YamlConfiguration config = new YamlConfiguration();
+                    config.set("prefix", "&8[&3WorldSystem&8] &6");
+                    config.set("command_prefix", "realms");
+                    config.set("worldfolder", "plugins/WorldSystem/Worlds");
+                    config.set("language", "en");
+                    config.set("need_confirm", true);
+                    config.set("contact_authserver", true);
+                    config.set("spawn.gamemode", 2);
+                    config.set("spawn.spawnpoint.use_last_location", false);
+                    config.set("spawn.spawnpoint.world", "world");
+                    config.set("spawn.spawnpoint.x", 0);
+                    config.set("spawn.spawnpoint.y", 64);
+                    config.set("spawn.spawnpoint.z", 0);
+                    config.set("spawn.spawnpoint.yaw", 0);
+                    config.set("spawn.spawnpoint.pitch", 0);
+                    config.set("request_expires", 20);
+                    config.set("load_worlds_async", true);
+                    config.set("unloadingtime", 20);
+                    config.set("delete_after", -1);
+                    config.set("lagsystem.period_in_seconds", 10);
+                    config.set("lagsystem.entities_per_world", 350);
+                    config.set("lagsystem.garbagecollector.use", false);
+                    config.set("lagsystem.garbagecollector.period_in_minutes", 5);
+                    config.set("database.type", "sqlite");
+                    config.set("database.worlds_table_name", "worlds_positions");
+                    config.set("database.players_table_name", "player_positions");
+                    config.set("database.players_uuids", "players_uuids");
+                    config.set("database.mysql_settings.host", "127.0.0.1");
+                    config.set("database.mysql_settings.port", 3306);
+                    config.set("database.mysql_settings.username", "root");
+                    config.set("database.mysql_settings.password", "YOUR_PASSWORD_HERE");
+                    config.set("database.mysql_settings.database", "database");
+                    config.set("database.sqlite_settings.file", "plugins/WorldSystem/repository.db");
+                    config.set("survival", true);
+                    config.set("spawn_teleportation", true);
+                    config.set("worldspawn.use_last_location", true);
+                    config.set("worldspawn.use", false);
+                    config.set("worldspawn.spawnpoint.x", 0);
+                    config.set("worldspawn.spawnpoint.y", 20);
+                    config.set("worldspawn.spawnpoint.z", 0);
+                    config.set("worldspawn.spawnpoint.yaw", 0);
+                    config.set("worldspawn.spawnpoint.pitch", 0);
+                    config.set("worldtemplates.multi_choose", false);
+                    config.set("worldtemplates.default", "template_default");
+                    config.save(file);
+                }
             } catch (IOException e) {
-                WorldSystem.logger().log(Level.SEVERE,"Wasn't able to create Config");
-                e.printStackTrace();
+                WorldSystem.logger().log(Level.SEVERE, "Wasn't able to create Config", e);
             }
         }
 
@@ -157,6 +213,10 @@ public class PluginConfig {
 
     public static String getPrefix() {
         return ChatColor.translateAlternateColorCodes('&', getConfig().getString("prefix", "§8[§3WorldSystem§8] §6"));
+    }
+
+    public static String getCommandPrefix() {
+        return getConfig().getString("command_prefix", "ws");
     }
 
     public static Location getWorldSpawn(World w) {

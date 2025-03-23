@@ -138,14 +138,13 @@ public class WorldSettingsCommands {
 
             WorldConfig config = WorldConfig.getWorldConfig(p.getWorld().getName());
             Location playerLocation = p.getLocation();
-            config.home = playerLocation;
-            WorldSystem.logger().log(Level.INFO,"installed");
+            config.home = new Location(playerLocation.getWorld(), 
+                                     playerLocation.getX(), 
+                                     playerLocation.getY(), 
+                                     playerLocation.getZ(), 
+                                     playerLocation.getYaw(), 
+                                     playerLocation.getPitch());
             try {
-                if (config.home == playerLocation) {
-                    WorldSystem.logger().log(Level.INFO,"registered");
-                } else {
-                    WorldSystem.logger().log(Level.INFO,"registered incorrectly");
-                }
                 config.save();
                 p.sendMessage(MessageConfig.getHomeSet());
             } catch (IOException e) {

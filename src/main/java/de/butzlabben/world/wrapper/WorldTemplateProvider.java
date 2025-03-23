@@ -1,12 +1,17 @@
 package de.butzlabben.world.wrapper;
 
+import de.butzlabben.world.WorldSystem;
 import de.butzlabben.world.config.PluginConfig;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 /**
  * @author Butzlabben
@@ -24,7 +29,42 @@ public class WorldTemplateProvider {
     public void reload() {
         templates.clear();
 
+        // Get the templates section
         ConfigurationSection section = PluginConfig.getConfig().getConfigurationSection("worldtemplates.templates");
+        
+        // If templates section doesn't exist, create default template
+        if (section == null) {
+            WorldSystem.logger().info("No templates section found in config.yml. Creating default template...");
+            
+            // Create worldsources directory if it doesn't exist
+            File worldSourcesDir = new File("plugins/WorldSystem/worldsources");
+            if (!worldSourcesDir.exists()) {
+                worldSourcesDir.mkdirs();
+            }
+            
+            // Create default template directory
+            File defaultTemplateDir = new File(worldSourcesDir, "template_default");
+            if (!defaultTemplateDir.exists()) {
+                defaultTemplateDir.mkdirs();
+            }
+            
+            // Update config.yml with default template
+            YamlConfiguration config = PluginConfig.getConfig();
+            config.set("worldtemplates.templates.1.name", "template_default");
+            
+            try {
+                config.save(new File("plugins/WorldSystem/config.yml"));
+                WorldSystem.logger().info("Created default template configuration");
+                
+                // Reload the section after creating it
+                section = config.getConfigurationSection("worldtemplates.templates");
+            } catch (IOException e) {
+                WorldSystem.logger().log(Level.SEVERE, "Failed to save default template configuration", e);
+                return;
+            }
+        }
+
+        // Load templates from config
         for (String key : section.getKeys(false)) {
             String name = section.getString(key + ".name");
             String permission = null;

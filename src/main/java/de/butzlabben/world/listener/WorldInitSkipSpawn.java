@@ -19,7 +19,7 @@ public class WorldInitSkipSpawn implements Listener {
             return;
 
         SettingsConfig.editWorld(world);
-        //e.getWorld().setKeepSpawnInMemory(false);
-        world.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
+        world.setKeepSpawnInMemory(false);
+        //world.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
     }
 }

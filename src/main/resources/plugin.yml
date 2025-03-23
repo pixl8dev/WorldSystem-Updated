@@ -1,19 +1,20 @@
 name: ${pluginname}
 main: ${group}.world.WorldSystem
-version: ${version}
+version: ${project.version}
 authors: ${authors}
-description: ${description}
+description: ${plugin.description}
 api-version: ${apiversion}
 load: STARTUP
 folia-supported: false
-depend: ${depend}
-softdepend: ${softdepend}
+depend: ${plugin.depend}
+softdepend: ${plugin.softdepend}
 
 commands:
-  ws:
+  ${command.prefix}:
     description: WorldSystem command
     permission: ws.use
-    # usage: /ws <subcommand>
+    aliases: [ws]
+    usage: /<command> <subcommand>
 
 permissions:
   ws.*:

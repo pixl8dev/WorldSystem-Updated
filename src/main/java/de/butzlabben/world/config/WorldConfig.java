@@ -11,10 +11,13 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.World;
 
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
@@ -125,7 +128,11 @@ public class WorldConfig {
         if (owner.equals(player))
             throw new IllegalArgumentException("Permissions of the owner cannot change");
         HashSet<WorldPerm> perms = permissions.computeIfAbsent(player, k -> new HashSet<>());
-        return perms.add(perm);
+        boolean added = perms.add(perm);
+        if (added) {
+            updateWorldBorder();
+        }
+        return added;
     }
 
     /**
@@ -143,7 +150,11 @@ public class WorldConfig {
         if (perms == null) {
             return false;
         }
-        return perms.remove(perm);
+        boolean removed = perms.remove(perm);
+        if (removed) {
+            updateWorldBorder();
+        }
+        return removed;
     }
 
     /**
@@ -289,6 +300,25 @@ public class WorldConfig {
             addPermission(player, WorldPerm.BUILD);
         } else {
             removePermission(player, WorldPerm.BUILD);
+        }
+        updatePlayerGameMode(player);
+    }
+
+    private void updatePlayerGameMode(UUID playerUUID) {
+        World world = Bukkit.getWorld(getWorldName());
+        if (world != null) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null && player.getWorld().getName().equals(getWorldName())) {
+                if (canBuild(playerUUID)) {
+                    if (PluginConfig.isSurvival()) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                    } else {
+                        player.setGameMode(GameMode.CREATIVE);
+                    }
+                } else {
+                    player.setGameMode(GameMode.ADVENTURE);
+                }
+            }
         }
     }
 
@@ -594,5 +624,12 @@ public class WorldConfig {
 
     public void setTemplateKey(String templateKey) {
         this.templateKey = templateKey;
+    }
+
+    private void updateWorldBorder() {
+        World world = Bukkit.getWorld(getWorldName());
+        if (world != null) {
+            SettingsConfig.editWorld(world);
+        }
     }
 }

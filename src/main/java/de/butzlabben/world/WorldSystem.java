@@ -44,54 +44,73 @@ public class WorldSystem extends JavaPlugin {
 
     public static void createConfigs() {
         File folder = getInstance().getDataFolder();
-        File dir = new File(folder + "/worldsources");
-        File config = new File(folder, "config.yml");
-        File dconfig = new File(folder, "dependence.yml");
-        File languages = new File(folder + "/languages");
-        File gui = new File(folder, "gui.yml");
-
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
 
-        if (!languages.exists())
-            languages.mkdirs();
+        // Create required directories
+        File worldSourcesDir = new File(folder + "/worldsources");
+        File languagesDir = new File(folder + "/languages");
+        
+        if (!worldSourcesDir.exists()) {
+            worldSourcesDir.mkdirs();
+        }
+        if (!languagesDir.exists()) {
+            languagesDir.mkdirs();
+        }
 
-        PluginConfig.checkConfig(config);
+        // Create and check all required configuration files
+        File configFile = new File(folder, "config.yml");
+        File dependenceFile = new File(folder, "dependence.yml");
+        File guiFile = new File(folder, "gui.yml");
+        File settingsFile = new File(folder, "settings.yml");
 
-        MessageConfig.checkConfig(new File(languages, "en.yml"));
-        MessageConfig.checkConfig(new File(languages, "de.yml"));
-        MessageConfig.checkConfig(new File(languages, "hu.yml"));
-        MessageConfig.checkConfig(new File(languages, "nl.yml"));
-        MessageConfig.checkConfig(new File(languages, "pl.yml"));
-        MessageConfig.checkConfig(new File(languages, "es.yml"));
-        MessageConfig.checkConfig(new File(languages, "ru.yml"));
-        MessageConfig.checkConfig(new File(languages, "fi.yml"));
-        MessageConfig.checkConfig(new File(languages, "ja.yml"));
-        MessageConfig.checkConfig(new File(languages, "zh.yml"));
-        MessageConfig.checkConfig(new File(languages, "fr.yml"));
+        // Check and create main config
+        PluginConfig.checkConfig(configFile);
 
-        MessageConfig.checkConfig(new File(languages, PluginConfig.getLanguage() + ".yml"));
+        // Check and create GUI config
+        GuiConfig.checkConfig(guiFile);
 
-        if (!dconfig.exists()) {
+        // Check and create settings config
+        SettingsConfig.checkConfig();
+
+        // Create dependence file if it doesn't exist
+        if (!dependenceFile.exists()) {
             try {
-                dconfig.createNewFile();
+                dependenceFile.createNewFile();
+                YamlConfiguration cfg = YamlConfiguration.loadConfiguration(dependenceFile);
+                cfg.set("HighestID", 0);
+                cfg.save(dependenceFile);
             } catch (IOException e) {
                 WorldSystem.logger().log(Level.SEVERE, "Wasn't able to create DependenceConfig");
                 e.printStackTrace();
             }
-            new DependenceConfig();
         }
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(config);
-        SettingsConfig.checkConfig();
+        // Check and create language files
+        MessageConfig.checkConfig(new File(languagesDir, "en.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "de.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "hu.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "nl.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "pl.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "es.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "ru.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "fi.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "ja.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "zh.yml"));
+        MessageConfig.checkConfig(new File(languagesDir, "fr.yml"));
 
-        File worlddir = new File(cfg.getString("worldfolder"));
-        if (!worlddir.exists()) {
-            worlddir.mkdirs();
+        // Check and create language file for configured language
+        MessageConfig.checkConfig(new File(languagesDir, PluginConfig.getLanguage() + ".yml"));
+
+        // Create worlds directory if specified in config
+        String worldsDir = PluginConfig.getWorlddir();
+        if (worldsDir != null && !worldsDir.isEmpty()) {
+            File worldsFolder = new File(worldsDir);
+            if (!worldsFolder.exists()) {
+                worldsFolder.mkdirs();
+            }
         }
-
-        GuiConfig.checkConfig(gui);
     }
 
     public static WorldSystem getInstance() {

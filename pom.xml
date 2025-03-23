@@ -10,7 +10,7 @@
 
         <properties>
             <!-- Dependencies -->
-            <SpigotAPI>1.21.4-R0.1-SNAPSHOT</SpigotAPI>
+            <paper.version>1.21.4-R0.1-SNAPSHOT</paper.version>
             <AuthLib>1.5.26</AuthLib>
             <WorldEdit>7.3.6-SNAPSHOT</WorldEdit>
             <FAWE>2.13.0</FAWE>
@@ -26,21 +26,38 @@
             <assertjcore>3.26.3</assertjcore>
 
             <!-- Compiler information (java version and encoding type) -->
-            <maven.compiler.release>21</maven.compiler.release>
+            <maven.compiler.source>17</maven.compiler.source>
+            <maven.compiler.target>17</maven.compiler.target>
             <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
             
-            <!-- These variables can be set in gradle.properties -->
-            <pluginname>${project.pluginname}</pluginname>
-            <group>${project.group}</group>
-            <authors>${project.authors}</authors>
-            <description>${project.description}</description>
-            <apiversion>${project.apiversion}</apiversion>
-            <minecraft>${project.minecraft}</minecraft>
-            <depend>${project.depend}</depend>
-            <softdepend>${project.softdepend}</softdepend>
+            <!-- Plugin properties -->
+            <pluginname>WorldSystem</pluginname>
+            <group>de.butzlabben</group>
+            <authors>[Butzlabben, Trainerlord, Cycodly]</authors>
+            <plugin.description>WorldSystem plugin to create per player worlds</plugin.description>
+            <apiversion>1.16</apiversion>
+            <command.prefix>realms</command.prefix>
+            <plugin.depend>[WorldEdit]</plugin.depend>
+            <plugin.softdepend>[PlaceholderAPI, Vault]</plugin.softdepend>
         </properties>
 
         <repositories>
+            <repository>
+                <id>papermc</id>
+                <url>https://repo.papermc.io/repository/maven-public/</url>
+            </repository>
+            <repository>
+                <id>spigot-repo</id>
+                <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            </repository>
+            <repository>
+                <id>spigot-public</id>
+                <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+            </repository>
+            <repository>
+                <id>spigot-releases</id>
+                <url>https://hub.spigotmc.org/nexus/content/repositories/releases/</url>
+            </repository>
             <repository>
                 <id>jitpack</id>
                 <url>https://jitpack.io</url>
@@ -58,16 +75,31 @@
         <dependencyManagement>
             <dependencies>
                 <dependency>
-                    <groupId>com.intellectualsites.bom</groupId> <!-- https://github.com/IntellectualSites/bom -->
+                    <groupId>com.intellectualsites.bom</groupId>
                     <artifactId>bom-newest</artifactId>
                     <version>1.50</version>
                     <scope>import</scope>
                     <type>pom</type>
                 </dependency>
+                <dependency>
+                    <groupId>org.spigotmc</groupId>
+                    <artifactId>spigot-api</artifactId>
+                    <version>${paper.version}</version>
+                    <type>jar</type>
+                    <scope>provided</scope>
+                </dependency>
             </dependencies>
         </dependencyManagement>
 
     <dependencies>
+
+    <!-- Paper API -->
+    <dependency>
+        <groupId>io.papermc.paper</groupId>
+        <artifactId>paper-api</artifactId>
+        <version>${paper.version}</version>
+        <scope>provided</scope>
+    </dependency>
 
     <!-- Adventure API for text formatting -->
     <dependency>
@@ -91,7 +123,7 @@
         <version>${CommonsIO}</version>
     </dependency>
 
-    <!-- Compile-only dependencies -->
+    <!-- PlaceholderAPI -->
     <dependency>
         <groupId>me.clip</groupId>
         <artifactId>placeholderapi</artifactId>
@@ -99,6 +131,7 @@
         <scope>provided</scope>
     </dependency>
 
+    <!-- VaultAPI -->
     <dependency>
         <groupId>com.github.MilkBowl</groupId>
         <artifactId>VaultAPI</artifactId>
@@ -106,6 +139,7 @@
         <scope>provided</scope>
     </dependency>
 
+    <!-- AuthLib -->
     <dependency>
         <groupId>com.mojang</groupId>
         <artifactId>authlib</artifactId>
@@ -113,13 +147,7 @@
         <scope>provided</scope>
     </dependency>
 
-    <dependency>
-        <groupId>org.spigotmc</groupId>
-        <artifactId>spigot-api</artifactId>
-        <version>${SpigotAPI}</version>
-        <scope>provided</scope>
-    </dependency>
-
+    <!-- WorldEdit -->
     <dependency>
         <groupId>com.sk89q.worldedit</groupId>
         <artifactId>worldedit-bukkit</artifactId>
@@ -134,6 +162,7 @@
         <scope>provided</scope>
     </dependency>
 
+    <!-- FAWE -->
     <dependency>
         <groupId>com.fastasyncworldedit</groupId>
         <artifactId>FastAsyncWorldEdit-Bukkit</artifactId>
@@ -174,20 +203,24 @@
 <build>
     <plugins>
         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>properties-maven-plugin</artifactId>
-            <version>1.2.1</version>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version>
+            <configuration>
+                <source>${maven.compiler.source}</source>
+                <target>${maven.compiler.target}</target>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.5.1</version>
             <executions>
                 <execution>
-                    <phase>initialize</phase>
+                    <phase>package</phase>
                     <goals>
-                        <goal>read-project-properties</goal>
+                        <goal>shade</goal>
                     </goals>
-                    <configuration>
-                        <files>
-                            <file>./gradle.properties</file>
-                        </files>
-                    </configuration>
                 </execution>
             </executions>
         </plugin>

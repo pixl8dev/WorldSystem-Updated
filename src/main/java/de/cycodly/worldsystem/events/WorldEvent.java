@@ -1,4 +1,4 @@
-package de.cycodly.worldsystem.event;
+package de.cycodly.worldsystem.events;
 
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

@@ -1,4 +1,4 @@
-package de.cycodly.worldsystem.event;
+package de.cycodly.worldsystem.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;

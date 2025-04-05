@@ -1,4 +1,4 @@
-package de.cycodly.worldsystem.event;
+package de.cycodly.worldsystem.events;
 
 import de.cycodly.worldsystem.wrapper.SystemWorld;
 import org.bukkit.command.CommandSender;

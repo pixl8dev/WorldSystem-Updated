@@ -21,7 +21,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import de.cycodly.worldsystem.guicreate.OrcItem;
 import de.cycodly.worldsystem.WorldSystem;
-import de.cycodly.worldsystem.util.VersionUtil;
 
 public class GuiConfig {
 

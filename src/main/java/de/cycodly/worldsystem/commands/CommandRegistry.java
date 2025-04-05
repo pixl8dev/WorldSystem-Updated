@@ -1,8 +1,5 @@
 package de.cycodly.worldsystem.commands;
 
-import de.cycodly.worldsystem.commands.WSCommands;
-import de.cycodly.worldsystem.commands.WorldAdministrateCommand;
-import de.cycodly.worldsystem.commands.WorldSettingsCommands;
 import de.cycodly.worldsystem.util.WorldUtils;
 import de.cycodly.worldsystem.wrapper.WorldTemplateProvider;
 import org.bukkit.Bukkit;

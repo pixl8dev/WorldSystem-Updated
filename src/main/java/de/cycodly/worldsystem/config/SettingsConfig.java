@@ -37,6 +37,7 @@ public class SettingsConfig {
 
     // TODO rebuild this, as it's inperformant and not very beautiful code.
     // only load once, and then reload the things from the disk on command
+    //@SuppressWarnings("deprecation")
     public static void editWorld(World w) {
         YamlConfiguration cfg = getConfig();
 

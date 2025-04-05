@@ -1,0 +1,36 @@
+{
+    "$schema" : "https://docs.renovatebot.com/renovate-schema.json",
+    "extends" : [
+      "config:recommended",
+      ":semanticCommitsDisabled"
+    ],
+    "automerge" : true,
+    "ignoreDeps" : [
+      "guava",
+      "com.google.guava:guava",
+      "rhino-runtime",
+      "org.antlr",
+      "antlr4-runtime",
+      "fastutil",
+      "it.unimi.dsi:fastutil",
+      "auto-value-annotations",
+      "auto-value",
+      "com.google.code.gson:gson",
+      "net.fabricmc:fabric-loader",
+      "net.fabricmc.fabric-api:fabric-api",
+      "com.github.luben:zstd-jni",
+      "org.jetbrains.kotlin.jvm",
+      "log4j",
+      "org.apache.logging.log4j:log4j-api",
+      "org.apache.logging.log4j:log4j-bom",
+      "org.apache.logging.log4j:log4j-slf4j-impl",
+      "org.apache.logging.log4j:log4j-core",
+      "org.bstats:bstats-sponge",
+      "org.spongepowered:spongeapi",
+      "org.yaml:snakeyaml"
+    ],
+    "labels" : [
+      "Renovate"
+    ],
+    "rebaseWhen" : "conflicted"
+}

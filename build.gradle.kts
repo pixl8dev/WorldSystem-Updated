@@ -1,8 +1,8 @@
 val plugingroup = "de.cycodly"
-val pluginname = "WorldSystem"
+val pluginname = "WorldSystemUpdated"
 val pluginauthors = "[Butzlabben, Trainerlord, Cycodly]"
 val pluginversion = "2.4.40-dev"
-val plugindescription = "WorldSystem plugin to create per player worlds"
+val plugindescription = "Worldsystem - Let players create thier own worlds"
 val pluginapiversion = "1.16"
 val pluginminecraft = "1.21.4"
 val plugindepend = "[WorldEdit]"
@@ -38,6 +38,8 @@ dependencies {
     annotationProcessor(libs.lombok)
     implementation(libs.commonsio)
     implementation(libs.minimessage)
+    implementation(libs.bstatsBukkit) { isTransitive = false }
+    implementation(libs.bstatsBase) { isTransitive = false }
     compileOnly(libs.spigotapi)
     compileOnly(libs.lombok)
     compileOnly(libs.placeholderapi)
@@ -86,7 +88,11 @@ tasks.shadowJar {
     dependencies {
         exclude(dependency("commons-io:commons-io"))
         exclude(dependency("net.kyori:adventure-text-minimessage"))
+        relocate("org.bstats", "de.cycodly.worldsystem.bstats") {
+            include(dependency("org.bstats:"))
+        }
     }
+    
 }
 
 tasks.withType<Javadoc> {
@@ -120,11 +126,11 @@ tasks.test {
 }
 
 tasks.jar {
-    archiveFileName.set("$pluginname-$pluginversion.jar")
+    archiveFileName.set("$pluginname-$pluginversion-noShade.jar")  
 }
 
 tasks.build {
-    //dependsOn(tasks.shadowJar)
+    dependsOn(tasks.shadowJar)
 }
 
 project.defaultTasks("build")

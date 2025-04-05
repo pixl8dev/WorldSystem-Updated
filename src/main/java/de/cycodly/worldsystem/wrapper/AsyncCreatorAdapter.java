@@ -23,41 +23,33 @@ public class AsyncCreatorAdapter implements ICreatorAdapter {
         // Load ChunkyAPI service
         ChunkyAPI chunky = Bukkit.getServer().getServicesManager().load(ChunkyAPI.class);
         String worldName = creator.name();
+        WorldCreator world;
 
-        if (Bukkit.getWorld(worldName) == null) {
+        if (Bukkit.getWorld(worldName) == null && chunky.version() == 0) {
             // Start Chunky world generation task asynchronously
+            Bukkit.getWorlds().add(creator.createWorld());
+            WorldSystem.logger().log(Level.SEVERE,"World " + worldName + " starting Chunky generation...");
             chunky.startTask(worldName, "square", 0, 0, 500, 500, "concentric");
 
             // Set up callback for when the generation is complete
-            chunky.onGenerationComplete(this::onWSGenComplete);
+            //chunky.onGenerationComplete(this::onWSGenComplete);
+            chunky.onGenerationComplete(event -> generationComplete = true);
 
-            new Thread(() -> {
-                while (!generationComplete) {
-                    try {
-                        Thread.sleep(100); // Check every 100ms if generation is complete
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            if (generationComplete) {
+                WorldSystem.logger().log(Level.SEVERE,"World generation completed for " + worldName);
+                Block block = Bukkit.getWorld(worldName).getBlockAt(0, -64, 0);
+                block.setType(Material.BEDROCK);
+
+                //world.createWorld();
+
+                if (sw != null) {
+                    sw.setCreating(false);
                 }
-                // Once generation is complete, perform the next actions (on the main thread)
-                Bukkit.getScheduler().runTask(worldSystem, () -> {
-                    // Perform block operation after generation is complete
-                    Block block = Bukkit.getWorld(worldName).getBlockAt(0, -64, 0);
-                    block.setType(Material.BEDROCK);
-                    if (sw != null) {
-                        sw.setCreating(false);  // Mark world creation as complete
-                    }
-                    r.run();
-                });
-            }).start();
+                r.run();
+            }
         } else {
             WorldSystem.logger().log(Level.SEVERE,"World " + worldName + " already exists, no generation.");
             r.run();
         }
-    }
-    // This method will be triggered when generation is complete
-    private void onWSGenComplete(GenerationCompleteEvent event) {
-        generationComplete = true;
-        Bukkit.getLogger().info("World generation completed for " + event.world());
     }
 }

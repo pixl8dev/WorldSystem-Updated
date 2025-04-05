@@ -27,16 +27,14 @@ import net.md_5.bungee.api.ChatColor;
 
 public class PluginConfig {
 
-    private final static GameMode[] gameModes = new GameMode[]{GameMode.SURVIVAL, GameMode.CREATIVE,
-            GameMode.ADVENTURE, GameMode.SPECTATOR};
-    private static File file;
+    private final static GameMode[] GAME_MODES = new GameMode[]{GameMode.SURVIVAL, GameMode.CREATIVE, GameMode.ADVENTURE, GameMode.SPECTATOR};
+    private static File FILE;
 
-    private PluginConfig() {
-    }
+    private PluginConfig() {}
 
     public static void checkConfig(File f) {
-        file = f;
-        if (file.exists()) {
+        FILE = f;
+        if (FILE.exists()) {
             YamlConfiguration cfg = getConfig();
             if (!(cfg.isString("worldfolder") && cfg.isInt("unloadingtime")
                     && cfg.isBoolean("survival") && cfg.isString("language") && cfg.isString("prefix")
@@ -70,11 +68,11 @@ public class PluginConfig {
                     && (cfg.isDouble("worldspawn.spawnpoint.yaw") || cfg.isInt("worldspawn.spawnpoint.yaw"))
                     && (cfg.isDouble("worldspawn.spawnpoint.pitch") || cfg.isInt("worldspawn.spawnpoint.pitch")))) {
                 try {
-                    Files.copy(file.toPath(),
-                            new File(file.getParentFile(), "config-broken-"
+                    Files.copy(FILE.toPath(),
+                            new File(FILE.getParentFile(), "config-broken-"
                                     + new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss").format(new Date()) + ".yml").toPath(),
                             StandardCopyOption.REPLACE_EXISTING);
-                    Files.delete(file.toPath());
+                    Files.delete(FILE.toPath());
                     WorldSystem.logger().log(Level.SEVERE,"[WorldSystem] Config is broken, creating a new one!");
                     checkConfig(f);
                 } catch (IOException e) {
@@ -83,11 +81,66 @@ public class PluginConfig {
             }
         } else {
             try {
+                // Create parent directories if they don't exist
+                if (!FILE.getParentFile().exists()) {
+                    FILE.getParentFile().mkdirs();
+                }
+                // Try to get the config from resources
                 InputStream in = JavaPlugin.getPlugin(WorldSystem.class).getResource("config.yml");
-                Files.copy(in, file.toPath());
+                if (in != null) {
+                    // Copy from resources
+                    Files.copy(in, FILE.toPath());
+                    in.close();
+                } else {
+                    // Create a new config with default values if resource not found
+                    YamlConfiguration config = new YamlConfiguration();
+                    config.set("prefix", "&8[&3WorldSystem&8] &6");
+                    config.set("command_prefix", "realms");
+                    config.set("worldfolder", "plugins/WorldSystem/Worlds");
+                    config.set("language", "en");
+                    config.set("need_confirm", true);
+                    config.set("contact_authserver", true);
+                    config.set("spawn.gamemode", 2);
+                    config.set("spawn.spawnpoint.use_last_location", false);
+                    config.set("spawn.spawnpoint.world", "world");
+                    config.set("spawn.spawnpoint.x", 0);
+                    config.set("spawn.spawnpoint.y", 64);
+                    config.set("spawn.spawnpoint.z", 0);
+                    config.set("spawn.spawnpoint.yaw", 0);
+                    config.set("spawn.spawnpoint.pitch", 0);
+                    config.set("request_expires", 20);
+                    config.set("load_worlds_async", true);
+                    config.set("unloadingtime", 20);
+                    config.set("delete_after", -1);
+                    config.set("lagsystem.period_in_seconds", 10);
+                    config.set("lagsystem.entities_per_world", 350);
+                    config.set("lagsystem.garbagecollector.use", false);
+                    config.set("lagsystem.garbagecollector.period_in_minutes", 5);
+                    config.set("database.type", "sqlite");
+                    config.set("database.worlds_table_name", "worlds_positions");
+                    config.set("database.players_table_name", "player_positions");
+                    config.set("database.players_uuids", "players_uuids");
+                    config.set("database.mysql_settings.host", "127.0.0.1");
+                    config.set("database.mysql_settings.port", 3306);
+                    config.set("database.mysql_settings.username", "root");
+                    config.set("database.mysql_settings.password", "YOUR_PASSWORD_HERE");
+                    config.set("database.mysql_settings.database", "database");
+                    config.set("database.sqlite_settings.file", "plugins/WorldSystem/repository.db");
+                    config.set("survival", true);
+                    config.set("spawn_teleportation", true);
+                    config.set("worldspawn.use_last_location", true);
+                    config.set("worldspawn.use", false);
+                    config.set("worldspawn.spawnpoint.x", 0);
+                    config.set("worldspawn.spawnpoint.y", 20);
+                    config.set("worldspawn.spawnpoint.z", 0);
+                    config.set("worldspawn.spawnpoint.yaw", 0);
+                    config.set("worldspawn.spawnpoint.pitch", 0);
+                    config.set("worldtemplates.multi_choose", false);
+                    config.set("worldtemplates.default", "template_default");
+                    config.save(FILE);
+                }
             } catch (IOException e) {
-                WorldSystem.logger().log(Level.SEVERE,"Wasn't able to create Config");
-                e.printStackTrace();
+                WorldSystem.logger().log(Level.SEVERE,"Wasn't able to create Config", e);
             }
         }
 
@@ -100,7 +153,7 @@ public class PluginConfig {
     public static YamlConfiguration getConfig() {
         try {
             return YamlConfiguration
-                    .loadConfiguration(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+                    .loadConfiguration(new InputStreamReader(new FileInputStream(FILE), StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -136,7 +189,7 @@ public class PluginConfig {
     }
 
     public static GameMode getSpawnGamemode() {
-        return gameModes[getConfig().getInt("spawn.gamemode", 2)];
+        return GAME_MODES[getConfig().getInt("spawn.gamemode", 2)];
     }
 
     public static String getWorlddir() {
@@ -159,6 +212,10 @@ public class PluginConfig {
         return ChatColor.translateAlternateColorCodes('&', getConfig().getString("prefix", "§8[§3WorldSystem§8] §6"));
     }
 
+    public static String getCommandPrefix() {
+        return getConfig().getString("cmd_prefix", "ws");
+    }
+
     public static Location getWorldSpawn(World w) {
         return getLocation(getConfig(), "worldspawn.spawnpoint", w);
     }
@@ -179,9 +236,11 @@ public class PluginConfig {
                 (float) cfg.getDouble(path + ".pitch", 0));
     }
 
-    public static boolean confirmNeed() {
-        return getConfig().getBoolean("need_confirm", true);
-    }
+    /**
+     * public static boolean confirmNeed() {
+     * return getConfig().getBoolean("need_confirm", true);
+     * }
+     **/
 
     public static boolean contactAuth() {
         return getConfig().getBoolean("contact_authserver", true);

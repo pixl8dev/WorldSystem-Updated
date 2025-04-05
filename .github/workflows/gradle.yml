@@ -1,12 +1,14 @@
 name: Build
 on: [push]
+
 jobs:
+  
   build:
 
     runs-on: ubuntu-latest
-    # We want to run on external PRs, but not on our own internal PRs as they'll be run
-    # by the push to the branch.
-    # if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+#     We want to run on external PRs, but not on our own internal PRs as they'll be run
+#     by the push to the branch.
+#     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     
     steps:
       - name: Set up JDK 21
@@ -31,3 +33,9 @@ jobs:
         run: ./gradlew build -x test --warning-mode all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+#      - name: Upload build artifacts
+#        uses: actions/upload-artifact@v4.6.2
+#        with:
+#          name: build-artifacts
+#          path: build/libs/

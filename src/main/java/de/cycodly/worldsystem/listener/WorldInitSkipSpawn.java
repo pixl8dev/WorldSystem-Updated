@@ -15,11 +15,10 @@ public class WorldInitSkipSpawn implements Listener {
         World world = e.getWorld();
         world.getWorldBorder().setWarningDistance(0);
         SystemWorld sw = SystemWorld.getSystemWorld(world.getName());
-        if(sw == null)
+        if (sw == null) {
             return;
-
+        }
         SettingsConfig.editWorld(world);
-        //e.getWorld().setKeepSpawnInMemory(false);
         world.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, 0);
     }
 }

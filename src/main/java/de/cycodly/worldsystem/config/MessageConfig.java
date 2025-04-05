@@ -40,22 +40,69 @@ public class MessageConfig {
         defaultCmdHelp.add("/ws reset §8- §7Will reset your World");
     }
 
-    private MessageConfig() {
-    }
+    private MessageConfig() {}
 
     public static void checkConfig(File f) {
         file = f;
         if (!file.exists()) {
             try {
+                // Create parent directories if they don't exist
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                // Try to get the language file from resources
                 InputStream in = JavaPlugin.getPlugin(WorldSystem.class).getResource("languages/" + f.getName());
 
-                if (in == null) {
+                if (in != null) {
+                    Files.copy(in, file.toPath());
+                    in.close();
+                } else {
+                    // If specific language file not found, try to use custom_messages template
                     in = JavaPlugin.getPlugin(WorldSystem.class).getResource("custom_messages.yml");
+                    if (in != null) {
+                        Files.copy(in, file.toPath());
+                        in.close();
+                    } else {
+                        // Create default messages if no resource found
+                        WorldSystem.logger().log(Level.WARNING, "Could not find message file in resources, creating default messages");
+                        YamlConfiguration config = new YamlConfiguration();
+
+                        // Add default messages
+                        config.set("nopermission", "&cYou don't have permissions!");
+                        config.set("world.setting_up", "&aSetting up world...");
+                        config.set("world.playerlist", "Player in this world: %player");
+                        config.set("lagdetection", "Lagdetection in world from: &c%world");
+                        config.set("wrong_usage", "&c%usage");
+                        config.set("world.does_not_exists.own", "&cYou don't have a world!");
+                        config.set("world.does_not_exists.other", "&cThis player doesn't has a world!");
+                        config.set("not_registered", "&cThis player hasn't joined yet!");
+                        config.set("member.already_added", "&cThis player is already a member!");
+                        config.set("member.added", "You have added &c%player&6 to your World!");
+                        config.set("unknown_error", "&cSomething went wrong...");
+                        config.set("world.delete.own", "&cYour world was deleted!");
+                        config.set("world.delete.other", "You deleted the world of &c%player&6!");
+                        config.set("member.not_added.own", "&cThis player isn't a member!");
+                        config.set("member.removed", "You removed &c%player&6 from your world!");
+                        config.set("member.no_one_added", "&cThere are no members added");
+                        config.set("world.already_exists", "&cYou already have a world!");
+                        config.set("world.created", "Your world is now ready. Get there with &a/ws home");
+                        config.set("world.still_creating", "&cWorld is still creating");
+                        config.set("world.not_on", "&cYou are not on a world!");
+                        config.set("world.still_loaded", "&cYour world is still loaded!");
+                        config.set("request.not_sent", "&cYou didn't send a request!");
+                        config.set("world.reseted", "Your world was reseted!");
+                        config.set("request.invalid_input", "&c%input is not a valid input!");
+                        config.set("request.already_sent", "&cYou already sent a request!");
+                        config.set("request.expired", "&cYou request is expired!");
+                        config.set("request.until_expire", "&cYour request expires in %time seconds!");
+                        config.set("request.confirm", "&cPlease confirm reset of your world: %command");
+
+                        // Save the config
+                        config.save(file);
+                    }
                 }
-                Files.copy(in, file.toPath());
             } catch (IOException e) {
-                WorldSystem.logger().log(Level.SEVERE,"Wasn't able to create Message file");
-                e.printStackTrace();
+                WorldSystem.logger().log(Level.SEVERE, "Wasn't able to create Message file", e);
             }
         }
     }
@@ -252,7 +299,6 @@ public class MessageConfig {
     public static String getToggleWorldeditDisabled() {
         return getMessage("toggle.worldedit.disabled", "§c%player§6 can no longer use WorldEdit!");
     }
-
 
     public static String getToggleFireEnabled() {
         return getMessage("toggle.fire.enabled", "§aYou activated fire!");

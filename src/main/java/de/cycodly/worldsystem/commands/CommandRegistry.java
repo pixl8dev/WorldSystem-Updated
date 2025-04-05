@@ -83,14 +83,11 @@ public class CommandRegistry implements TabExecutor {
                 case "reset":
                     return settings.resetCommand(sender, command, label, args);
                 case "sethome":
-                    sender.sendMessage("Disabled For Major Error and Rework");
-                    return false;
-                            /*
                     if (sender.hasPermission("ws.sethome")) {
                         return settings.setHomeCommand(sender, command, label, args);
                     } else {
                         return false;
-                    }*/
+                    }
                 case "tnt":
                     return settings.tntCommand(sender, command, label, args);
                 case "fire":

@@ -18,9 +18,9 @@ import de.cycodly.worldsystem.config.DependenceConfig;
 import de.cycodly.worldsystem.config.MessageConfig;
 import de.cycodly.worldsystem.config.PluginConfig;
 import de.cycodly.worldsystem.config.WorldConfig;
-import de.cycodly.worldsystem.event.WorldResetEvent;
-import de.cycodly.worldsystem.event.WorldToggleFireEvent;
-import de.cycodly.worldsystem.event.WorldToggleTntEvent;
+import de.cycodly.worldsystem.events.WorldResetEvent;
+import de.cycodly.worldsystem.events.WorldToggleFireEvent;
+import de.cycodly.worldsystem.events.WorldToggleTntEvent;
 import de.cycodly.worldsystem.gui.WorldChooseGUI;
 import de.cycodly.worldsystem.util.PlayerPositions;
 import de.cycodly.worldsystem.wrapper.SystemWorld;
@@ -31,91 +31,91 @@ import de.cycodly.worldsystem.wrapper.WorldTemplateProvider;
 public class WorldSettingsCommands {
     private static final ArrayList<Player> toConfirm = new ArrayList<>();
 
-
     public boolean resetCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
 
-        DependenceConfig dc = new DependenceConfig(p);
-        String worldname = dc.getWorldname();
-        SystemWorld sw = SystemWorld.getSystemWorld(worldname);
-        if (!dc.hasWorld()) {
-            p.sendMessage(MessageConfig.getNoWorldOwn());
-            return false;
-        }
-        if (args.length > 1) {
-            if (args[1].equalsIgnoreCase("confirm")) {
-                if (sw.isLoaded())
-                    sw.directUnload(Bukkit.getWorld(worldname));
+            DependenceConfig dc = new DependenceConfig(p);
+            String worldname = dc.getWorldname();
+            SystemWorld sw = SystemWorld.getSystemWorld(worldname);
+            if (!dc.hasWorld()) {
+                p.sendMessage(MessageConfig.getNoWorldOwn());
+                return false;
+            }
+            if (args.length > 1) {
+                if (args[1].equalsIgnoreCase("confirm")) {
+                    if (sw.isLoaded())
+                        sw.directUnload(Bukkit.getWorld(worldname));
 
-                if (!toConfirm.contains(p)) {
-                    p.sendMessage(MessageConfig.getNoRequestSend());
-                    return false;
-                }
-                WorldResetEvent event = new WorldResetEvent(p, sw);
-                Bukkit.getPluginManager().callEvent(event);
-                if (event.isCancelled())
-                    return false;
-
-                if (sw.isLoaded()) {
-                    p.sendMessage(MessageConfig.getWorldStillLoaded());
-                    return false;
-                }
-
-                WorldConfig config = WorldConfig.getWorldConfig(worldname);
-                // Delete positions to prevent suffocating and such stuff
-                PlayerPositions.instance.deletePositions(config);
-
-                File f = new File(PluginConfig.getWorlddir() + "/" + worldname);
-
-                if (!PluginConfig.isMultiChoose()) {
-                    WorldTemplate template = WorldTemplateProvider.getInstance()
-                            .getTemplate(PluginConfig.getDefaultWorldTemplate());
-                    if (template != null)
-                        createWorld(p, worldname, f, template, sw);
-                    else {
-                        p.sendMessage(PluginConfig.getPrefix() + "§cError in config at \"worldtemplates.default\"");
-                        p.sendMessage(PluginConfig.getPrefix() + "§cPlease contact an administrator");
+                    if (!toConfirm.contains(p)) {
+                        p.sendMessage(MessageConfig.getNoRequestSend());
+                        return false;
                     }
-                } else {
-                    WorldChooseGUI.letChoose(p, (template) -> {
+                    WorldResetEvent event = new WorldResetEvent(p, sw);
+                    Bukkit.getPluginManager().callEvent(event);
+                    if (event.isCancelled())
+                        return false;
+
+                    if (sw.isLoaded()) {
+                        p.sendMessage(MessageConfig.getWorldStillLoaded());
+                        return false;
+                    }
+
+                    WorldConfig config = WorldConfig.getWorldConfig(worldname);
+                    // Delete positions to prevent suffocating and such stuff
+                    PlayerPositions.instance.deletePositions(config);
+
+                    File f = new File(PluginConfig.getWorlddir() + "/" + worldname);
+
+                    if (!PluginConfig.isMultiChoose()) {
+                        WorldTemplate template = WorldTemplateProvider.getInstance()
+                                .getTemplate(PluginConfig.getDefaultWorldTemplate());
                         if (template != null)
                             createWorld(p, worldname, f, template, sw);
                         else {
                             p.sendMessage(PluginConfig.getPrefix() + "§cError in config at \"worldtemplates.default\"");
                             p.sendMessage(PluginConfig.getPrefix() + "§cPlease contact an administrator");
                         }
-                    });
-                }
+                    } else {
+                        WorldChooseGUI.letChoose(p, (template) -> {
+                            if (template != null)
+                                createWorld(p, worldname, f, template, sw);
+                            else {
+                                p.sendMessage(
+                                        PluginConfig.getPrefix() + "§cError in config at \"worldtemplates.default\"");
+                                p.sendMessage(PluginConfig.getPrefix() + "§cPlease contact an administrator");
+                            }
+                        });
+                    }
 
+                } else {
+                    p.sendMessage(MessageConfig.getInvalidInput().replaceAll("%input", "\"reset " + args[1] + "\""));
+                }
             } else {
-                p.sendMessage(MessageConfig.getInvalidInput().replaceAll("%input", "\"reset " + args[1] + "\""));
-            }
-        } else {
-            if (sw.isLoaded())
-                sw.directUnload(Bukkit.getWorld(worldname));
+                if (sw.isLoaded())
+                    sw.directUnload(Bukkit.getWorld(worldname));
 
-            if (toConfirm.contains(p)) {
-                p.sendMessage(MessageConfig.getRequestAlreadySent());
-                return false;
-            }
-
-            int time = PluginConfig.getRequestExpire();
-            p.sendMessage(MessageConfig.getConfirmRequest().replaceAll("%command", "/ws reset confirm"));
-            p.sendMessage(MessageConfig.getTimeUntilExpires().replaceAll("%time", String.valueOf(time)));
-            toConfirm.add(p);
-            Bukkit.getScheduler().runTaskLater(WorldSystem.getInstance(), () -> {
                 if (toConfirm.contains(p)) {
-                    p.sendMessage(MessageConfig.getRequestExpired());
-                    toConfirm.remove(p);
+                    p.sendMessage(MessageConfig.getRequestAlreadySent());
+                    return false;
                 }
-            }, time * 20L);
+
+                int time = PluginConfig.getRequestExpire();
+                p.sendMessage(MessageConfig.getConfirmRequest().replaceAll("%command", "/ws reset confirm"));
+                p.sendMessage(MessageConfig.getTimeUntilExpires().replaceAll("%time", String.valueOf(time)));
+                toConfirm.add(p);
+                Bukkit.getScheduler().runTaskLater(WorldSystem.getInstance(), () -> {
+                    if (toConfirm.contains(p)) {
+                        p.sendMessage(MessageConfig.getRequestExpired());
+                        toConfirm.remove(p);
+                    }
+                }, time * 20L);
+            }
+            return true;
+        } else {
+            sender.sendMessage("No Console"); // TODO Get Config
+            return false;
         }
-        return true;
-    } else {
-        sender.sendMessage("No Console"); //TODO Get Config
-        return false;
-    }
     }
 
     public boolean setHomeCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -138,13 +138,19 @@ public class WorldSettingsCommands {
 
             WorldConfig config = WorldConfig.getWorldConfig(p.getWorld().getName());
             Location playerLocation = p.getLocation();
-            config.home = playerLocation;
-            WorldSystem.logger().log(Level.INFO,"installed");
+            config.home = new Location(
+                    playerLocation.getWorld(),
+                    playerLocation.getX(),
+                    playerLocation.getY(),
+                    playerLocation.getZ(),
+                    playerLocation.getYaw(),
+                    playerLocation.getPitch());
+            WorldSystem.logger().log(Level.INFO, "installed");
             try {
                 if (config.home == playerLocation) {
-                    WorldSystem.logger().log(Level.INFO,"registered");
+                    WorldSystem.logger().log(Level.INFO, "registered");
                 } else {
-                    WorldSystem.logger().log(Level.INFO,"registered incorrectly");
+                    WorldSystem.logger().log(Level.INFO, "registered incorrectly");
                 }
                 config.save();
                 p.sendMessage(MessageConfig.getHomeSet());
@@ -154,14 +160,14 @@ public class WorldSettingsCommands {
             }
             return true;
         } else {
-            sender.sendMessage("No Console"); //TODO Get Config
+            sender.sendMessage("No Console"); // TODO Get Config
             return false;
         }
     }
 
     public boolean tntCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (sender instanceof Player) {
-                Player p = (Player) sender;
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
             DependenceConfig dc = new DependenceConfig(p);
             if (!dc.hasWorld()) {
                 p.sendMessage(MessageConfig.getNoWorldOwn());
@@ -188,58 +194,49 @@ public class WorldSettingsCommands {
             } else {
                 p.sendMessage(MessageConfig.getToggleTntDisabled());
             }
-                return true;
-            } else {
-                sender.sendMessage("No Console"); //TODO Get Config
-                return false;
-            }
-        }
-
-    public boolean fireCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player p = (Player) sender;
-        DependenceConfig dc = new DependenceConfig(p);
-        if (!dc.hasWorld()) {
-            p.sendMessage(MessageConfig.getNoWorldOwn());
-            return false;
-        }
-
-        WorldConfig wc = WorldConfig.getWorldConfig(dc.getWorldname());
-        boolean fire = wc.isFire();
-        WorldToggleFireEvent event = new WorldToggleFireEvent(p, SystemWorld.getSystemWorld(dc.getWorldname()), fire);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled())
-            return false;
-
-        wc.setFire(p.getUniqueId(), !fire);
-        try {
-            wc.save();
-        } catch (IOException e) {
-            p.sendMessage(PluginConfig.getPrefix() + "§cSomething went wrong");
-            e.printStackTrace();
-        }
-        fire = wc.isFire();
-        if (fire) {
-            p.sendMessage(MessageConfig.getToggleFireEnabled());
-        } else {
-            p.sendMessage(MessageConfig.getToggleFireDisabled());
-        }
             return true;
         } else {
-            sender.sendMessage("No Console"); //TODO Get Config
+            sender.sendMessage("No Console"); // TODO Get Config
             return false;
         }
     }
 
+    public boolean fireCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
+            DependenceConfig dc = new DependenceConfig(p);
+            if (!dc.hasWorld()) {
+                p.sendMessage(MessageConfig.getNoWorldOwn());
+                return false;
+            }
 
+            WorldConfig wc = WorldConfig.getWorldConfig(dc.getWorldname());
+            boolean fire = wc.isFire();
+            WorldToggleFireEvent event = new WorldToggleFireEvent(p, SystemWorld.getSystemWorld(dc.getWorldname()),
+                    fire);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled())
+                return false;
 
-
-
-
-
-
-
-
+            wc.setFire(p.getUniqueId(), !fire);
+            try {
+                wc.save();
+            } catch (IOException e) {
+                p.sendMessage(PluginConfig.getPrefix() + "§cSomething went wrong");
+                e.printStackTrace();
+            }
+            fire = wc.isFire();
+            if (fire) {
+                p.sendMessage(MessageConfig.getToggleFireEnabled());
+            } else {
+                p.sendMessage(MessageConfig.getToggleFireDisabled());
+            }
+            return true;
+        } else {
+            sender.sendMessage("No Console"); // TODO Get Config
+            return false;
+        }
+    }
 
     private void createWorld(Player p, String worldname, File f, WorldTemplate template, SystemWorld sw) {
 
@@ -282,7 +279,7 @@ public class WorldSettingsCommands {
         } catch (IOException e) {
             e.printStackTrace();
             p.sendMessage(MessageConfig.getUnknownError());
-            WorldSystem.logger().log(Level.SEVERE,"Couldn't reset world of " + p.getName());
+            WorldSystem.logger().log(Level.SEVERE, "Couldn't reset world of " + p.getName());
         }
     }
 }

@@ -34,18 +34,48 @@ public class GuiConfig {
         file = f;
         if (!file.exists()) {
             try {
+                // Create parent directories if they don't exist
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                // Try to get the config from resources
                 InputStream in = JavaPlugin.getPlugin(WorldSystem.class).getResource("gui.yml");
-                Files.copy(in, file.toPath());
+                if (in != null) {
+                    Files.copy(in, file.toPath());
+                    in.close();
+                } else {
+                    WorldSystem.logger().log(Level.WARNING,
+                            "Could not find gui.yml in resources, creating default config");
+                    // Create default GUI config
+                    YamlConfiguration config = new YamlConfiguration();
+                    config.set("options.enabled.material", "LIME_DYE");
+                    config.set("options.enabled.display", "&aEnabled");
+                    config.set("options.disabled.material", "GRAY_DYE");
+                    config.set("options.disabled.display", "&cDisabled");
+                    config.set("options.coming_soon.material", "BARRIER");
+                    config.set("options.coming_soon.display", "&cComing soon");
+                    config.set("options.back.material", "ARROW");
+                    config.set("options.back.display", "&cBack");
+                    config.set("options.fill.material", "BLACK_STAINED_GLASS_PANE");
+                    config.set("options.fill.display", " ");
+                    config.set("options.players.playerhead.material", "PLAYER_HEAD");
+                    config.save(file);
+                }
+
             } catch (IOException e) {
-                WorldSystem.logger().log(Level.SEVERE,"Wasn't able to create Config");
-                e.printStackTrace();
+                WorldSystem.logger().log(Level.SEVERE, "Wasn't able to create GUI", e);
+                return;
             }
         }
-        OrcItem.enabled = getEnabled();
-        OrcItem.disabled = getDisabled();
-        OrcItem.coming_soon = getComingSoon();
-        OrcItem.back = getBack();
-        OrcItem.fill = getFill();
+        try {
+            OrcItem.enabled = getEnabled();
+            OrcItem.disabled = getDisabled();
+            OrcItem.coming_soon = getComingSoon();
+            OrcItem.back = getBack();
+            OrcItem.fill = getFill();
+        } catch (Exception e) {
+            WorldSystem.logger().log(Level.SEVERE, "Failed to initialize GUI items", e);
+        }
     }
 
     public static YamlConfiguration getConfig() {

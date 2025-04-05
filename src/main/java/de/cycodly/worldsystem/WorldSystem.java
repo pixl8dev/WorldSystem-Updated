@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bstats.bukkit.Metrics;
 
 import de.cycodly.worldsystem.commands.CommandRegistry;
 import de.cycodly.worldsystem.config.DependenceConfig;
@@ -39,50 +40,48 @@ import de.cycodly.worldsystem.wrapper.AsyncCreatorAdapter;
  * @since 10.07.2017
  */
 public class WorldSystem extends JavaPlugin {
-    private static boolean is1_13Plus = false;
-    final private String version = this.getDescription().getVersion();
-    private ICreatorAdapter creator;
-    
+    private static final int BSTATS_ID = 25205;
+    private static boolean ABOVE_V13 = false;
+    private final String PLUGINVERSION = this.getDescription().getVersion();
+    private ICreatorAdapter CREATOR_INSTANCE;
 
     public static void createConfigs() {
         File folder = getInstance().getDataFolder();
-        File dir = new File(folder + "/worldsources");
-        File config = new File(folder, "config.yml");
-        File dconfig = new File(folder, "dependence.yml");
-        File languages = new File(folder + "/languages");
-        File gui = new File(folder, "gui.yml");
-        String[] langfile = {"en","de","hu","nl","pl","es","ru","fi","ja","zh","fr"};
-
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
 
+        // Create directories
+        File sources = new File(folder + "/worldsources");
+        File languages = new File(folder + "/languages");
+
+        if (!sources.exists()) {
+            sources.mkdirs();
+        }
         if (!languages.exists()) {
             languages.mkdirs();
         }
 
-        PluginConfig.checkConfig(config);
+        // Create files
+        File guiYML = new File(folder, "gui.yml");
+        File configYML = new File(folder, "config.yml");
+        File dependenceYML = new File(folder, "dependence.yml");
+        String[] langYML = { "en", "de", "hu", "nl", "pl", "es", "ru", "fi", "ja", "zh", "fr", PluginConfig.getLanguage() };
 
-        for (String lang : langfile) {
-            MessageConfig.checkConfig(new File(languages, lang+".yml"));
+        PluginConfig.checkConfig(configYML);
+        GuiConfig.checkConfig(guiYML);
+        SettingsConfig.checkConfig();
+        YamlConfiguration confg = YamlConfiguration.loadConfiguration(configYML);
+
+        for (String lang : langYML) {
+            MessageConfig.checkConfig(new File(languages, lang + ".yml"));
         }
-        /*MessageConfig.checkConfig(new File(languages, "en.yml"));
-        MessageConfig.checkConfig(new File(languages, "de.yml"));
-        MessageConfig.checkConfig(new File(languages, "hu.yml"));
-        MessageConfig.checkConfig(new File(languages, "nl.yml"));
-        MessageConfig.checkConfig(new File(languages, "pl.yml"));
-        MessageConfig.checkConfig(new File(languages, "es.yml"));
-        MessageConfig.checkConfig(new File(languages, "ru.yml"));
-        MessageConfig.checkConfig(new File(languages, "fi.yml"));
-        MessageConfig.checkConfig(new File(languages, "ja.yml"));
-        MessageConfig.checkConfig(new File(languages, "zh.yml"));
-        MessageConfig.checkConfig(new File(languages, "fr.yml"));*/
 
-        MessageConfig.checkConfig(new File(languages, PluginConfig.getLanguage() + ".yml"));
-
-        if (!dconfig.exists()) {
+        if (!dependenceYML.exists()) {
             try {
-                dconfig.createNewFile();
+                dependenceYML.createNewFile();
+                confg.set("HighestID", 0);
+                confg.save(dependenceYML);
             } catch (IOException e) {
                 WorldSystem.logger().log(Level.SEVERE, "Wasn't able to create DependenceConfig");
                 e.printStackTrace();
@@ -90,15 +89,14 @@ public class WorldSystem extends JavaPlugin {
             new DependenceConfig();
         }
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(config);
-        SettingsConfig.checkConfig();
-
-        File worlddir = new File(cfg.getString("worldfolder"));
-        if (!worlddir.exists()) {
-            worlddir.mkdirs();
+        // Create worlds directory if specified in config
+        String worlds = PluginConfig.getWorlddir();
+        if (worlds != null && !worlds.isEmpty()) {
+            File worldsDir = new File(worlds);
+            if (!worldsDir.exists()) {
+                worldsDir.mkdirs();
+            }
         }
-
-        GuiConfig.checkConfig(gui);
     }
 
     public static WorldSystem getInstance() {
@@ -116,15 +114,15 @@ public class WorldSystem extends JavaPlugin {
         getCommand("ws").setTabCompleter(new CommandRegistry());
 
         // Set right version
-        if (VersionUtil.getVersion() >= 13)
-            is1_13Plus = true;
-
+        if (VersionUtil.getVersion() >= 13) {
+            ABOVE_V13 = true;
+        }
         createConfigs();
 
         // Establish database connection
         DataProvider.instance.util.connect();
 
-        // Check if tables exist and create them if necessary.
+        // Check if tables exist and create them if necessary. Fix for #34
         PlayerPositions.instance.checkTables();
 
         PluginManager pm = Bukkit.getPluginManager();
@@ -149,13 +147,18 @@ public class WorldSystem extends JavaPlugin {
             }
         }, 20 * 60 * 2, 20 * 60 * 2);
 
-        if (Bukkit.getPluginManager().getPlugin("Chunky") != null
-                && PluginConfig.loadWorldsASync()) {
+        // System.setProperty("bstats.relocatecheck", "false");
+        Metrics metrics = new Metrics(this, BSTATS_ID);
+        // metrics.addCustomChart(new SingleLineChart("worlds", DependenceConfig::getHighestID));
 
-            creator = new AsyncCreatorAdapter();
+        if (Bukkit.getPluginManager().getPlugin("Chunky") != null && PluginConfig.loadWorldsASync()) {
+
             Bukkit.getConsoleSender().sendMessage(PluginConfig.getPrefix() + "Found Chunky! Worlds now will be created asynchronously");
+            CREATOR_INSTANCE = new AsyncCreatorAdapter();
+
         } else {
-            creator = (c, sw, r) -> {
+            
+            CREATOR_INSTANCE = (c, sw, r) -> {
                 Bukkit.getWorlds().add(c.createWorld());
                 if (sw != null)
                     sw.setCreating(false);
@@ -171,7 +174,7 @@ public class WorldSystem extends JavaPlugin {
         }
 
         Bukkit.getConsoleSender()
-                .sendMessage(PluginConfig.getPrefix() + "Successfully enabled WorldSystem v" + version);
+                .sendMessage(PluginConfig.getPrefix() + "Successfully enabled WorldSystem v" + PLUGINVERSION);
 
         new BukkitRunnable() {
             @Override
@@ -201,10 +204,10 @@ public class WorldSystem extends JavaPlugin {
         DataProvider.instance.util.close();
 
         Bukkit.getConsoleSender()
-                .sendMessage(PluginConfig.getPrefix() + "Successfully disabled WorldSystem v" + version);
+                .sendMessage(PluginConfig.getPrefix() + "Successfully disabled WorldSystem v" + PLUGINVERSION);
     }
 
     public ICreatorAdapter getAdapter() {
-        return creator;
+        return CREATOR_INSTANCE;
     }
 }

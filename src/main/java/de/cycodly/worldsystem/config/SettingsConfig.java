@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -27,15 +28,14 @@ import de.cycodly.worldsystem.wrapper.SystemWorld;
 //maybe just merge this config with the WorldConfig
 public class SettingsConfig {
 
-    private static final HashMap<String, Long> borderSizes = new HashMap<>();
+    private static final HashMap<String, Long> BORDER_SIZES = new HashMap<>();
 
     private static File file;
 
     private SettingsConfig() {
     }
 
-    //@SuppressWarnings("deprecation")
-    // TODO rebuild this, as it's inperformant and not very beautiful code..
+    // TODO rebuild this, as it's inperformant and not very beautiful code.
     // only load once, and then reload the things from the disk on command
     public static void editWorld(World w) {
         YamlConfiguration cfg = getConfig();
@@ -54,9 +54,9 @@ public class SettingsConfig {
                 if (p != null && p.isOnline()) {
 
                     // Check permissions
-                    for (String string : borderSizes.keySet()) {
-                        if (p.hasPermission(string) && size < borderSizes.get(string)) {
-                            size = borderSizes.get(string);
+                    for (String string : BORDER_SIZES.keySet()) {
+                        if (p.hasPermission(string) && size < BORDER_SIZES.get(string)) {
+                            size = BORDER_SIZES.get(string);
                         }
                     }
 
@@ -88,7 +88,8 @@ public class SettingsConfig {
             Difficulty difficulty = Difficulty.valueOf(diff.toUpperCase());
             w.setDifficulty(difficulty);
         } catch (IllegalArgumentException e) {
-            Bukkit.getConsoleSender().sendMessage(PluginConfig.getPrefix() + "§cUnknown difficulty \"" + diff + "\" in settings.yml");
+            Bukkit.getConsoleSender()
+                    .sendMessage(PluginConfig.getPrefix() + "§cUnknown difficulty \"" + diff + "\" in settings.yml");
         }
 
         if (w.isGameRule("announceAdvancements"))
@@ -179,17 +180,78 @@ public class SettingsConfig {
         SettingsConfig.file = file;
         if (!file.exists()) {
             try {
+                // Create parent directories if they don't exist
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+
+                // Try to get the config from resources
                 InputStream in = JavaPlugin.getPlugin(WorldSystem.class).getResource("settings.yml");
-                Files.copy(in, file.toPath());
+                if (in != null) {
+                    Files.copy(in, file.toPath());
+                    in.close();
+                } else {
+                    // Create default settings if resource not found
+                    WorldSystem.logger().log(Level.WARNING,
+                            "Could not find settings.yml in resources, creating default settings");
+                    YamlConfiguration config = new YamlConfiguration();
+
+                    // World border settings
+                    config.set("worldborder.should_change", true);
+                    config.set("worldborder.normal", 1000);
+                    config.set("worldborder.center.as_spawn", true);
+                    config.set("worldborder.center.as_home", false);
+                    config.set("worldborder.center.x", 0);
+                    config.set("worldborder.center.y", 64);
+                    config.set("worldborder.center.z", 0);
+                    config.set("worldborder.ranks.ws.big", 2000);
+                    config.set("worldborder.ranks.ws.large", 5000);
+
+                    // Game rules
+                    config.set("difficulty", "NORMAL");
+                    config.set("announceAdvancements", "true");
+                    config.set("commandBlockOutput", "true");
+                    config.set("disableElytraMovementCheck", "false");
+                    config.set("doDaylightCycle", "true");
+                    config.set("doEntityDrops", "true");
+                    config.set("doFireTick", "true");
+                    config.set("doLimitedCrafting", "false");
+                    config.set("doMobLoot", "true");
+                    config.set("doMobSpawning", "true");
+                    config.set("doTileDrops", "true");
+                    config.set("doWeatherCycle", "true");
+                    config.set("keepInventory", "false");
+                    config.set("logAdminCommands", "true");
+                    config.set("maxCommandChainLength", "65536");
+                    config.set("maxEntityCramming", "24");
+                    config.set("mobGriefing", "true");
+                    config.set("naturalRegeneration", "true");
+                    config.set("randomTickSpeed", "3");
+                    config.set("reducedDebugInfo", "false");
+                    config.set("sendCommandFeedback", "true");
+                    config.set("showDeathMessages", "true");
+                    config.set("spawnRadius", "10");
+                    config.set("spectatorsGenerateChunks", "true");
+
+                    // Commands to execute when getting a world
+                    config.set("commands_on_get", new ArrayList<String>());
+
+                    config.save(file);
+                }
             } catch (IOException e) {
-                WorldSystem.logger().log(Level.SEVERE,"Wasn't able to create Config");
-                e.printStackTrace();
+                WorldSystem.logger().log(Level.SEVERE, "Wasn't able to create settings.yml", e);
+                return;
             }
         }
+
+        // Load world border settings
         YamlConfiguration cfg = getConfig();
-        for (String s : cfg.getConfigurationSection("worldborder.ranks").getKeys(true)) {
-            if (cfg.isInt("worldborder.ranks." + s) || cfg.isLong("worldborder.ranks." + s))
-                borderSizes.put(s, cfg.getLong("worldborder.ranks." + s));
+        if (cfg != null && cfg.isConfigurationSection("worldborder.ranks")) {
+
+            for (String s : cfg.getConfigurationSection("worldborder.ranks").getKeys(true)) {
+                if (cfg.isInt("worldborder.ranks." + s) || cfg.isLong("worldborder.ranks." + s))
+                    BORDER_SIZES.put(s, cfg.getLong("worldborder.ranks." + s));
+            }
         }
     }
 
